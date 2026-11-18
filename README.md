@@ -168,7 +168,14 @@ python build_survey_agent.py \
 
 Run the first four LSMS-style questions with `python run_survey.py`. Use
 `python run_survey.py --all` to run the full questionnaire. Each batch is saved
-under `survey_run/` as `responses.csv`.
+under `survey_run/` as `responses.csv`. These commands return stored answers;
+`--mode predict` asks the LLM to predict instead.
+
+Survey agents read `survey_responses.json` directly. Their `memory_stream/nodes.json`
+is `[]` and `memory_stream/embeddings.json` is `{}`; they do not use vector
+retrieval. Rebuilding the survey agent preserves those empty files. Running a
+survey writes answers to `survey_run/responses.csv`; it does not add those
+answers to the agent's stored profile automatically.
 
 `Survey.survey` takes the same question-to-options dictionary as
 `GenerativeAgent.categorical_resp`. Load the bundled questions and return the

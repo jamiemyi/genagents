@@ -54,7 +54,7 @@ class SurveyAgent:
         ]
 
     def recorded_resp(self, questions):
-        """Return stored answers by survey item id without making an LLM call."""
+        """Return stored answers by question text without making an LLM call."""
         by_question = {_normalized(item["question"]): item for item in self.items}
         answers = []
         for question, options in questions.items():
