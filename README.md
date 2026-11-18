@@ -142,6 +142,8 @@ print(survey["responses"])
 print(agent.utterance([["Interviewer", "Tell me about your favorite hobby."]]))
 ```
 
+To use the code from another project folder instead, install this repo there in editable mode (`pip install -e "/path/to/genagents[local]"`). The `settings.py` in this repo still applies.
+
 The first run downloads the small embedding model (about 90 MB). After that, this example takes about 30 seconds and prints something like `['Can be trusted', 'Pretty happy']` followed by a few sentences about drawing and painting.
 
 #### Survey-style agent from the sample interview

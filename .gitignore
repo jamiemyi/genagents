@@ -4,3 +4,5 @@ __pycache__/
 *.pyc
 embeddings.json.bak
 .venv/
+*.egg-info/
+build/

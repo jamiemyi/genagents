@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "genagents"
+version = "0.1.0"
+description = "Generative agent simulations (fork with Claude/Codex CLI backends)"
+requires-python = ">=3.9"
+dependencies = ["numpy"]
+
+[project.optional-dependencies]
+openai = ["openai"]
+local = ["sentence-transformers"]
+
+[tool.setuptools.packages.find]
+include = ["genagents*", "simulation_engine*", "environment*"]
+namespaces = true
