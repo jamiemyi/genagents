@@ -3,7 +3,7 @@ Re-embed the memory nodes of one or more agents with the current
 EMBEDDING_BACKEND, so stored vectors match the model used at query time.
 
 Usage:
-  python reembed_agents.py agent_bank/populations/single_agent [more paths]
+  python reembed_agents.py agent_bank/populations/interview_agent [more paths]
 
 Each path can be an agent folder or any folder containing agents. The old
 embeddings.json is kept as embeddings.json.bak (if no backup exists yet).

@@ -38,7 +38,7 @@ Additionally, to provide users with a sense of the interview-based agents, we of
     - [Adding Memories](#adding-memories)
     - [Reflection](#reflection)
   - [Saving and Loading Agents](#saving-and-loading-agents)
-- [Sample Agent](#sample-agent)
+- [Interview Agent](#sample-agent)
 - [Agent Bank Access](#agent-bank-access)
 - [Contributing](#contributing)
 - [License](#license)
@@ -99,13 +99,13 @@ LOCAL_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
 With both settings off `"openai"`, `OPENAI_API_KEY` is not used and `openai` is not imported. Each LLM call runs the CLI headless with tools, MCP servers and file access turned off, so it only answers the prompt. `ANTHROPIC_API_KEY`, `ANTHROPIC_AUTH_TOKEN`, `OPENAI_API_KEY` and `CODEX_API_KEY` are removed from the CLI's environment so it bills your subscription, not the API.
 
-Memory retrieval compares stored embeddings with new ones, so they must come from the same model. After switching `EMBEDDING_BACKEND`, re-embed any agent that has memories (the GSS agents have none; the sample agent in this branch is already re-embedded for `"local"`):
+Memory retrieval compares stored embeddings with new ones, so they must come from the same model. After switching `EMBEDDING_BACKEND`, re-embed any agent that has memories (the GSS agents have none; the interview agent in this branch is already re-embedded for `"local"`):
 
 ```bash
-python reembed_agents.py agent_bank/populations/single_agent
+python reembed_agents.py agent_bank/populations/interview_agent
 ```
 
-The previous file is kept as `embeddings.json.bak`. To go back to `"openai"`, restore the backup or run the script again with that setting. (For the sample agent, the original OpenAI vectors are also in git history: `git checkout main -- agent_bank/populations/single_agent`.)
+The previous file is kept as `embeddings.json.bak`. To go back to `"openai"`, restore the backup or run the script again with that setting. (For the interview agent, the original OpenAI vectors are also in git history: `git checkout main -- agent_bank/populations/interview_agent`.)
 
 Things to know:
 
@@ -129,7 +129,7 @@ In `simulation_engine/settings.py`, set `LLM_BACKEND = "claude_cli"` (or `"codex
 ```python
 from genagents.genagents import GenerativeAgent
 
-agent = GenerativeAgent(agent_folder="agent_bank/populations/single_agent/01fd7d2a-0357-4c1b-9f3e-8eade2d537ae")
+agent = GenerativeAgent(agent_folder="agent_bank/populations/interview_agent/01fd7d2a-0357-4c1b-9f3e-8eade2d537ae")
 
 # Survey: categorical questions
 survey = agent.categorical_resp({
@@ -144,16 +144,82 @@ print(agent.utterance([["Interviewer", "Tell me about your favorite hobby."]]))
 
 The first run downloads the small embedding model (about 90 MB). After that, this example takes about 30 seconds and prints something like `['Can be trusted', 'Pretty happy']` followed by a few sentences about drawing and painting.
 
+#### Survey-style agent from the sample interview
+
+Following the [paper's survey prompt structure](https://arxiv.org/pdf/2411.10109),
+the `survey_agents` population contains a separate representation of the same
+sample person as survey question/answer records. The example uses an original
+55-item, [LSMS-inspired](https://documents1.worldbank.org/curated/en/452741468778781879/pdf/multi-page.pdf) household questionnaire covering demographics, education,
+work, migration, housing, consumption, health, finances, and assets. Answers
+are marked `reported` (stated in the source), `inferred` (a close implication),
+or `imagined` (a plausible answer supplied for this example). **This is a
+synthetic reconstruction, not a survey administered to the person or an official
+LSMS instrument.** The paper's survey-only results do not apply to it.
+
+Rebuild the files from the interview agent with:
+
+```bash
+python build_survey_agent.py \
+  agent_bank/populations/interview_agent/01fd7d2a-0357-4c1b-9f3e-8eade2d537ae \
+  agent_bank/populations/survey_agents/01fd7d2a-0357-4c1b-9f3e-8eade2d537ae
+```
+
+Run the first four LSMS-style questions with `python run_survey.py`. Use
+`python run_survey.py --all` to run the full questionnaire. Each batch is saved
+under `survey_run/` as `responses.csv`.
+
+`Survey.survey` takes the same question-to-options dictionary as
+`GenerativeAgent.categorical_resp`. Load the bundled questions and return the
+stored answers:
+
+```python
+import json
+from environment.survey.survey import Survey
+
+survey = Survey()
+survey.load_agents([{
+    "population": "agent_bank/populations/survey_agents",
+    "agent_id": "01fd7d2a-0357-4c1b-9f3e-8eade2d537ae"
+}])
+with open("environment/survey/lsms_like_questionnaire.json") as f:
+    questions = json.load(f)
+answers = survey.survey(questions, mode="recorded")
+print(answers)
+survey.save("survey_run")
+```
+
+To predict answers to new categorical questions from the synthetic profile:
+
+```python
+from environment.survey.survey import Survey
+
+survey = Survey()
+survey.load_agents([{
+    "population": "agent_bank/populations/survey_agents",
+    "agent_id": "01fd7d2a-0357-4c1b-9f3e-8eade2d537ae"
+}])
+result = survey.survey({
+    "Generally speaking, would you say most people can be trusted?":
+        ["Can be trusted", "Can't be too careful", "Depends"]
+})
+print(result)
+```
+
+In prediction mode, the survey agent passes its stored question/answer pairs
+to the LLM in blocks of up to four new questions, withholding exact target
+items. To reproduce the paper's survey condition, use actual survey responses
+in place of the synthetic answers.
+
 #### Using it from T3 Code
 
 [T3 Code](https://github.com/pingdotgg/t3code) runs Claude Code or Codex in threads on your machine. Open this folder as a project, start a thread, and ask the agent to do the work in plain language. It writes and runs the Python for you. The simulation's own LLM calls go through `claude` or `codex` too, so the whole run uses your subscription. Example prompts:
 
 - **Set up:** "Set up this repo for the subscription backend: make a Python 3.12 venv in `.venv`, install `requirements.txt`, and create `simulation_engine/settings.py` from `example-settings.py` with `LLM_BACKEND = "claude_cli"`, `CLAUDE_MODEL = "sonnet"` and `EMBEDDING_BACKEND = "local"`. Then run the Quick start example from the README."
-- **Survey:** "Load the sample agent in `agent_bank/populations/single_agent/01fd7d2a-0357-4c1b-9f3e-8eade2d537ae` and ask it these questions with `categorical_resp`: [your questions and answer options]. Show the answers in a table."
-- **Numeric scale:** "Ask the sample agent 'On a scale of 1 to 10, how much do you trust the news media?' with `numerical_resp` (range 1 to 10), five times, and report the mean and spread."
-- **Interview:** "Interview the sample agent for five turns about its childhood and career with `agent.utterance`. Keep the dialogue history between turns, write my follow-up questions based on its answers, and save the transcript to `interview.md`."
+- **Survey:** "Load the interview agent in `agent_bank/populations/interview_agent/01fd7d2a-0357-4c1b-9f3e-8eade2d537ae` and ask it these questions with `categorical_resp`: [your questions and answer options]. Show the answers in a table."
+- **Numeric scale:** "Ask the interview agent 'On a scale of 1 to 10, how much do you trust the news media?' with `numerical_resp` (range 1 to 10), five times, and report the mean and spread."
+- **Interview:** "Interview the interview agent for five turns about its childhood and career with `agent.utterance`. Keep the dialogue history between turns, write my follow-up questions based on its answers, and save the transcript to `interview.md`."
 - **New agent:** "Create a new agent with `update_scratch` from this description: [description]. Add these memories with `remember()`: [memories]. Save it to `agent_bank/populations/my_agents/<name>`, then ask it [question]."
-- **Compare backends:** "Run the same three survey questions on the sample agent once with `LLM_BACKEND = "claude_cli"` and once with `"codex_cli"`, and compare the answers side by side. Settings are read at import, so use a separate run for each."
+- **Compare backends:** "Run the same three survey questions on the interview agent once with `LLM_BACKEND = "claude_cli"` and once with `"codex_cli"`, and compare the answers side by side. Settings are read at import, so use a separate run for each."
 
 Tips:
 
@@ -178,7 +244,7 @@ Tips:
 - `agent_bank/`: Directory for storing agent data
   - `populations/`: Contains pre-generated agents
     - `gss_agents/`: Demographic agent data based on the GSS
-    - `single_agent/`: Example agent data (see [Sample Agent](#sample-agent))
+    - `interview_agent/`: Example agent data (see [Interview Agent](#sample-agent))
 - `README.md`: This readme file
 - `requirements.txt`: List of Python dependencies
 
@@ -247,6 +313,24 @@ response = agent.utterance(dialogue)
 print(response)
 ```
 
+To have a continuing conversation in the terminal, run `main.py`:
+
+```bash
+python main.py interview                 # Example interview agent (the default)
+python main.py jamie                     # Jamie's profile
+python main.py gss                       # First GSS agent by ID
+python main.py survey                    # Ask the survey agent a categorical question
+python main.py survey --agent-id 01fd7d2a-0357-4c1b-9f3e-8eade2d537ae
+python main.py --list-agents --limit 20  # Show GSS names and IDs
+python main.py --list-agents --search Eric
+python main.py gss --agent-id 05ced490-251d-4661-a324-502952c729df
+python main.py path/to/saved/agent       # Any saved agent folder
+```
+
+Chats keep earlier turns in their conversation history. Survey mode prompts for
+a question and answer choices separated by `|`, then predicts one listed answer
+from the survey agent's stored responses. Type `exit` or `quit` to finish.
+
 ### Memory and Reflection
 
 Agents have a memory stream that allows them to remember and reflect on experiences.
@@ -279,14 +363,14 @@ To load an existing agent:
 agent = GenerativeAgent(agent_folder="path/to/save_directory")
 ```
 
-## Sample Agent
+## Interview Agent
 
-A sample agent is provided in the `agent_bank/populations/single_agent/` directory. This agent includes a pre-populated memory stream and scratchpad information for demonstration purposes.
+An interview agent is provided in the `agent_bank/populations/interview_agent/` directory. This agent includes a pre-populated memory stream and scratchpad information for demonstration purposes.
 
-You can load and interact with the sample agent as follows:
+You can load and interact with the interview agent as follows:
 
 ```python
-agent = GenerativeAgent(agent_folder="agent_bank/populations/single_agent/01fd7d2a-0357-4c1b-9f3e-8eade2d537ae")
+agent = GenerativeAgent(agent_folder="agent_bank/populations/interview_agent/01fd7d2a-0357-4c1b-9f3e-8eade2d537ae")
 
 # Interact with the agent
 questions = {

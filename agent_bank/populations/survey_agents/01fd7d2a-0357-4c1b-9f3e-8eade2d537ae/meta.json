@@ -1,0 +1,13 @@
+{
+  "id": "01fd7d2a-0357-4c1b-9f3e-8eade2d537ae",
+  "agent_type": "synthetic_lsms_style_survey",
+  "source_agent": "agent_bank/populations/interview_agent/01fd7d2a-0357-4c1b-9f3e-8eade2d537ae",
+  "questionnaire": "environment/survey/lsms_like_questionnaire.json",
+  "reference_period": "time of the source interview",
+  "provenance_note": "Imagined LSMS-inspired answers; not an administered LSMS or participant survey",
+  "item_counts": {
+    "reported": 44,
+    "inferred": 3,
+    "imagined": 8
+  }
+}

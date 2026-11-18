@@ -1,7 +1,6 @@
 import uuid
 import os
 import json
-import pandas as pd
 
 
 class Environment:

@@ -9,7 +9,9 @@ from genagents.modules.memory_stream import *
 # ############################################################################
 
 class GenerativeAgent: 
-  def __init__(self, agent_folder=None):
+  def __init__(self, agent_folder=None, agent_id=None):
+    if agent_id is not None:
+      agent_folder = f"{agent_folder}/{agent_id}"
     if agent_folder: 
       # We stop the process if the agent storage folder already exists. 
       if not check_if_file_exists(f"{agent_folder}/scratch.json"):
@@ -19,13 +21,12 @@ class GenerativeAgent:
       # Loading the agent's memories. 
       with open(f"{agent_folder}/scratch.json") as json_file:
         scratch = json.load(json_file)
+      self.id = uuid.uuid4()
+      self.scratch = scratch
       with open(f"{agent_folder}/memory_stream/embeddings.json") as json_file:
         embeddings = json.load(json_file)
       with open(f"{agent_folder}/memory_stream/nodes.json") as json_file:
         nodes = json.load(json_file)
-
-      self.id = uuid.uuid4()
-      self.scratch = scratch
       self.memory_stream = MemoryStream(nodes, embeddings)
 
     else: 

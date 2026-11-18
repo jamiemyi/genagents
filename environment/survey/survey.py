@@ -87,4 +87,3 @@ class Survey(Environment):
                                     ignore_index=True)
 
     return outputs
-

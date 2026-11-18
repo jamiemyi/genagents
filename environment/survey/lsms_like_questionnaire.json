@@ -1,0 +1,276 @@
+{
+  "What age group are you in?": [
+    "18-24",
+    "25-34",
+    "35-44",
+    "45-54",
+    "55 or older"
+  ],
+  "What sex is recorded for you?": [
+    "Female",
+    "Male",
+    "Another response"
+  ],
+  "How many people usually live in your household, including you?": [
+    "1",
+    "2",
+    "3",
+    "4 or more"
+  ],
+  "What is your current marital status?": [
+    "Never married",
+    "Married",
+    "Separated",
+    "Divorced",
+    "Widowed"
+  ],
+  "Do you currently live with a romantic partner?": [
+    "Yes",
+    "No"
+  ],
+  "How would you describe your ethnic background?": [
+    "Korean",
+    "Other Asian",
+    "Another background"
+  ],
+  "Are you a U.S. citizen?": [
+    "Yes",
+    "No"
+  ],
+  "Do you speak a language other than English?": [
+    "Yes",
+    "No"
+  ],
+  "What is the highest degree you have completed?": [
+    "High school or less",
+    "Bachelor's degree",
+    "Master's degree",
+    "Doctoral degree"
+  ],
+  "Are you currently enrolled in formal education?": [
+    "Yes",
+    "No"
+  ],
+  "What level of program are you enrolled in?": [
+    "Not enrolled",
+    "Undergraduate program",
+    "Master's program",
+    "Doctoral program"
+  ],
+  "What is your current field of study?": [
+    "Computer science",
+    "Another STEM field",
+    "Humanities or arts",
+    "Other"
+  ],
+  "Where are you currently studying?": [
+    "Stanford University",
+    "Another university",
+    "Not enrolled"
+  ],
+  "Did you do any paid work in the last seven days?": [
+    "Yes",
+    "No"
+  ],
+  "What best describes your main occupation?": [
+    "Computer science researcher",
+    "Teacher",
+    "Other professional",
+    "Not working"
+  ],
+  "What kind of organization is your main workplace?": [
+    "University",
+    "Private company",
+    "Government",
+    "Self-employed",
+    "Not working"
+  ],
+  "How many paid jobs did you have in the last month?": [
+    "0",
+    "1",
+    "2 or more"
+  ],
+  "About how many hours do you usually work in a week?": [
+    "Under 30",
+    "30-49",
+    "50-69",
+    "70-89",
+    "90 or more"
+  ],
+  "How many weeks did you work during the last year?": [
+    "0",
+    "1-25",
+    "26-51",
+    "52"
+  ],
+  "What is your primary source of work income?": [
+    "Paid doctoral research position",
+    "Salary from another job",
+    "Self-employment",
+    "No work income"
+  ],
+  "Did you receive occasional income from speaking events?": [
+    "Yes",
+    "No"
+  ],
+  "In which country were you born?": [
+    "South Korea",
+    "United States",
+    "Another country"
+  ],
+  "At roughly what age did you move to the United States?": [
+    "Born in the United States",
+    "0-10",
+    "11-13",
+    "14-17",
+    "18 or older"
+  ],
+  "In which U.S. region did you live at age 16?": [
+    "New England",
+    "Other U.S. region",
+    "Outside the United States"
+  ],
+  "In which state do you currently live?": [
+    "California",
+    "Another state",
+    "Outside the United States"
+  ],
+  "What type of dwelling do you live in?": [
+    "Apartment",
+    "Detached house",
+    "Shared dormitory",
+    "Other"
+  ],
+  "Does your household own or rent its home?": [
+    "Own",
+    "Rent",
+    "Other arrangement"
+  ],
+  "Who usually pays your housing expenses?": [
+    "Mostly me",
+    "Shared with household members",
+    "Mostly someone else"
+  ],
+  "Is your home within about 30 minutes of your main workplace?": [
+    "Yes",
+    "No"
+  ],
+  "What is your approximate monthly rent?": [
+    "Under $1,500",
+    "$1,500-$2,499",
+    "$2,500-$3,499",
+    "$3,500 or more"
+  ],
+  "Does your dwelling have electricity?": [
+    "Yes",
+    "No"
+  ],
+  "Does your dwelling have piped water?": [
+    "Yes",
+    "No"
+  ],
+  "Does your dwelling have home internet access?": [
+    "Yes",
+    "No"
+  ],
+  "Which category was your largest household expense last month?": [
+    "Rent",
+    "Food",
+    "Transportation",
+    "Health care",
+    "Other"
+  ],
+  "Apart from rent, which expense is most regular for you?": [
+    "Food",
+    "Transportation",
+    "Health care",
+    "Other"
+  ],
+  "In the last year, were you unable to buy food you needed?": [
+    "Yes",
+    "No"
+  ],
+  "About how much does your household spend on food per month?": [
+    "Under $400",
+    "$400-$799",
+    "$800-$1,199",
+    "$1,200 or more"
+  ],
+  "Do you usually travel abroad to visit family during the year?": [
+    "Yes",
+    "No"
+  ],
+  "How would you rate your current health?": [
+    "Excellent",
+    "Good",
+    "Fair",
+    "Poor"
+  ],
+  "Do you currently have a chronic condition that limits daily life?": [
+    "Yes",
+    "No"
+  ],
+  "Has a health problem limited your ability to work recently?": [
+    "Yes",
+    "No"
+  ],
+  "Do you have health care coverage?": [
+    "Yes",
+    "No"
+  ],
+  "Have you had to skip needed health care because of cost or access?": [
+    "Yes",
+    "No"
+  ],
+  "Do you currently maintain a regular exercise routine?": [
+    "Yes",
+    "No"
+  ],
+  "Do you currently owe money on loans or credit cards?": [
+    "Yes",
+    "No"
+  ],
+  "Do you have savings available for unexpected expenses?": [
+    "Yes",
+    "No"
+  ],
+  "Could you pay a $400 emergency expense from available funds?": [
+    "Yes",
+    "No"
+  ],
+  "Do you currently receive means-tested government assistance?": [
+    "Yes",
+    "No"
+  ],
+  "In the last year, did you miss a bill because you lacked money?": [
+    "Yes",
+    "No"
+  ],
+  "How would you describe your current financial situation?": [
+    "Comfortable",
+    "Just getting by",
+    "Difficult"
+  ],
+  "Could family provide occasional financial help if needed?": [
+    "Yes",
+    "No"
+  ],
+  "What is your approximate total wealth?": [
+    "Under $20,000",
+    "$20,000-$79,999",
+    "$80,000-$100,000",
+    "Over $100,000"
+  ],
+  "Does your household own a car?": [
+    "Yes",
+    "No"
+  ],
+  "Do you personally own a computer?": [
+    "Yes",
+    "No"
+  ],
+  "Do you personally own a smartphone?": [
+    "Yes",
+    "No"
+  ]
+}
