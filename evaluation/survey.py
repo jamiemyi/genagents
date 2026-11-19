@@ -94,27 +94,34 @@ def write_csv(path: Path, fieldnames: list[str], rows: list[dict]) -> None:
         writer.writerows(rows)
 
 
-def predict(questions_path: Path, agents_path: Path, output_path: Path,
-            exclude_groups: tuple[str, ...] = ()) -> int:
+def predict(questions_path: Path, agents_path: Path, output_path: Path) -> int:
     # Import only for prediction; scoring needs no model or ML dependencies.
-    from genagents.survey_agent import SurveyAgent
+    from genagents.genagents import GenerativeAgent
 
     questions = load_questions(questions_path)
     agents = load_agents(agents_path)
     targets = {question.text: list(question.options) for question in questions.values()}
     rows = []
     for entry in agents:
-        agent = SurveyAgent(entry["folder"])
-        if str(agent.meta.get("id")) != entry["agent_id"]:
+        folder = entry["folder"]
+        meta = json.loads((folder / "meta.json").read_text())
+        if str(meta.get("id")) != entry["agent_id"]:
             raise ValueError(f"Agent ID does not match folder: {entry['folder']}")
-        # Exclude every evaluation item from the prompt, including items not in
-        # the current four-question block. Never use recorded_resp for evaluation.
-        answers = agent.categorical_resp(
-            targets, exclude_item_ids=tuple(questions), exclude_groups=exclude_groups
-        )["responses"]
+        if not meta.get("ready"):
+            raise ValueError(f"Agent has no survey responses: {folder}")
+        nodes = json.loads((folder / "memory_stream/nodes.json").read_text())
+        for node in nodes:
+            content = node.get("content", "")
+            if any(question.text.casefold() in content.casefold()
+                   for question in questions.values()):
+                raise ValueError(f"Evaluation question appears in agent memory: {folder}")
+        agent = GenerativeAgent(agent_folder=str(folder))
+        answers = agent.categorical_resp(targets)["responses"]
         if len(answers) != len(questions):
             raise ValueError(f"Wrong answer count from agent {entry['agent_id']}")
         for question, answer in zip(questions.values(), answers):
+            if answer not in question.options:
+                raise ValueError(f"Answer outside options from agent {entry['agent_id']}: {answer!r}")
             rows.append({
                 "agent_id": entry["agent_id"], "question_id": question.id,
                 "cohort": entry["cohort"], "answer": answer,
@@ -221,8 +228,6 @@ def main() -> None:
     predict_parser.add_argument("--questions", type=Path, required=True)
     predict_parser.add_argument("--agents", type=Path, required=True)
     predict_parser.add_argument("--output", type=Path, required=True)
-    predict_parser.add_argument("--exclude-group", action="append", default=[],
-                                help="withhold a survey response group from the prompt")
     score_parser = subparsers.add_parser("score", help="compare predictions with observed data")
     score_parser.add_argument("--questions", type=Path, required=True)
     score_parser.add_argument("--observed", type=Path, required=True)
@@ -231,8 +236,7 @@ def main() -> None:
     args = parser.parse_args()
     try:
         if args.command == "predict":
-            count = predict(args.questions, args.agents, args.output,
-                            tuple(args.exclude_group))
+            count = predict(args.questions, args.agents, args.output)
             print(f"Wrote {count} predictions to {args.output}")
         else:
             report = score(args.questions, args.observed, args.predicted,

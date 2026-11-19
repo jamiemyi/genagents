@@ -5,7 +5,6 @@ import json
 from pathlib import Path
 
 from genagents.genagents import GenerativeAgent
-from genagents.survey_agent import SurveyAgent
 from jamie_agent import create_jamie
 
 
@@ -72,7 +71,9 @@ def load_survey_agent(agent_id=None):
         raise ValueError(f"No survey agents found in {SURVEY_AGENTS}")
     folders = sorted(folder for folder in SURVEY_AGENTS.iterdir()
                      if folder.is_dir() and (folder / "meta.json").is_file()
-                     and (folder / "survey_responses.json").is_file())
+                     and json.loads((folder / "meta.json").read_text()).get("ready")
+                     and (folder / "memory_stream/nodes.json").is_file()
+                     and (folder / "memory_stream/embeddings.json").is_file())
     if not folders:
         raise ValueError(f"No survey agents found in {SURVEY_AGENTS}")
     if agent_id and agent_id not in {folder.name for folder in folders}:
@@ -80,7 +81,7 @@ def load_survey_agent(agent_id=None):
     folder = SURVEY_AGENTS / agent_id if agent_id else folders[0]
     if not agent_id:
         print(f"Using survey agent {folder.name}. Pass --agent-id to choose another.")
-    return SurveyAgent(folder)
+    return GenerativeAgent(agent_folder=str(folder))
 
 
 class Conversation:

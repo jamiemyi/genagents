@@ -6,7 +6,6 @@ from unittest.mock import patch
 
 from build_survey_agent import build
 from genagents.genagents import GenerativeAgent
-from genagents.survey_agent import SurveyAgent
 
 
 class SurveyBuilderTest(unittest.TestCase):
@@ -20,32 +19,27 @@ class SurveyBuilderTest(unittest.TestCase):
             "id": "respondent-001",
             "profile": {"first_name": "Avery", "last_name": "Example"},
             "responses": [
-                {"id": "q1", "group": "housing", "question": "Own or rent?",
-                 "answer": "Rent", "options": ["Own", "Rent"]},
-                {"id": "q2", "question": "Commute by transit?",
-                 "answer": "Yes", "options": ["Yes", "No"]},
+                {"question": "What age group are you in?", "answer": "25-34"},
+                {"question": "What sex is recorded for you?", "answer": "Female"},
             ],
         }
         self.input.write_text(json.dumps(self.data))
 
-    def test_build_creates_both_survey_and_memory_views(self):
+    def test_build_creates_interview_format_files(self):
         with patch("simulation_engine.gpt_structure.get_text_embedding",
                    side_effect=lambda text: [float(len(text)), 1.0]):
             folder = build(self.input, self.population)
         self.assertEqual(folder, self.population / "respondent-001")
-        records = json.loads((folder / "survey_responses.json").read_text())
         nodes = json.loads((folder / "memory_stream/nodes.json").read_text())
         embeddings = json.loads((folder / "memory_stream/embeddings.json").read_text())
-        questionnaire = json.loads((folder / "questionnaire.json").read_text())
-        self.assertEqual(len(records), len(nodes))
+        self.assertEqual({str(p.relative_to(folder)) for p in folder.rglob("*.json")},
+                         {"meta.json", "scratch.json", "memory_stream/nodes.json",
+                          "memory_stream/embeddings.json"})
+        self.assertEqual(len(nodes), 2)
         self.assertEqual(len(nodes), len(embeddings))
-        self.assertEqual(questionnaire["Own or rent?"], ["Own", "Rent"])
         for node in nodes:
             self.assertEqual(embeddings[node["content"]],
                              [float(len(node["content"])), 1.0])
-        survey_agent = SurveyAgent(folder)
-        self.assertEqual(survey_agent.recorded_resp({"Own or rent?": ["Own", "Rent"]})
-                         ["responses"], ["Rent"])
         memory_agent = GenerativeAgent(agent_folder=str(folder))
         self.assertEqual(len(memory_agent.memory_stream.seq_nodes), 2)
 
@@ -56,8 +50,9 @@ class SurveyBuilderTest(unittest.TestCase):
             build(self.input, self.population)
         self.assertFalse(self.population.exists())
 
-        self.data["responses"][0]["answer"] = "Rent"
-        self.data["responses"][1]["id"] = "q1"
+        self.data["responses"][0]["answer"] = "25-34"
+        self.data["responses"][1]["question"] = "What age group are you in?"
+        self.data["responses"][1]["answer"] = "25-34"
         self.input.write_text(json.dumps(self.data))
         with self.assertRaisesRegex(ValueError, "Duplicate question"):
             build(self.input, self.population)

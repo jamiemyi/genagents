@@ -1,17 +1,13 @@
-"""Create one survey agent from a JSON profile and answered questionnaire.
-
-See examples/survey_agent.example.json for the input format. The generated
-agent works with SurveyAgent and with the memory-based Survey environment.
-"""
+"""Build an interview-format agent from one respondent's LSMS answers."""
 
 import argparse
 import json
 import re
-from collections import Counter
 from pathlib import Path
 
 
 DEFAULT_POPULATION = Path(__file__).resolve().parent / "agent_bank/populations/survey_agents"
+QUESTIONNAIRE = Path(__file__).resolve().parent / "environment/survey/lsms_like_questionnaire.json"
 
 
 def _required_text(value, label):
@@ -20,7 +16,7 @@ def _required_text(value, label):
     return value.strip()
 
 
-def _validate_input(data):
+def _validate_input(data, questionnaire):
     if not isinstance(data, dict):
         raise ValueError("Input must be a JSON object")
     agent_id = _required_text(data.get("id"), "id")
@@ -33,49 +29,28 @@ def _validate_input(data):
     if not isinstance(responses, list) or not responses:
         raise ValueError("responses must be a non-empty list")
 
-    records, questionnaire, seen_ids, seen_questions = [], {}, set(), set()
+    records, seen_questions = [], set()
     for index, item in enumerate(responses, 1):
         if not isinstance(item, dict):
             raise ValueError(f"responses[{index}] must be an object")
-        item_id = _required_text(item.get("id"), f"responses[{index}].id")
         question = _required_text(item.get("question"), f"responses[{index}].question")
         answer = _required_text(item.get("answer"), f"responses[{index}].answer")
-        options = item.get("options")
-        if (not isinstance(options, list) or len(options) < 2
-                or any(not isinstance(option, str) or not option.strip()
-                       for option in options)
-                or len(set(options)) != len(options)):
-            raise ValueError(f"responses[{index}].options needs distinct non-empty choices")
+        options = questionnaire.get(question)
+        if options is None:
+            raise ValueError(f"responses[{index}].question is not in the LSMS questionnaire")
         if answer not in options:
             raise ValueError(f"responses[{index}].answer must match one option exactly")
-        normalized_question = " ".join(question.split()).casefold()
-        if item_id in seen_ids or normalized_question in seen_questions:
-            raise ValueError(f"Duplicate question id or text at responses[{index}]")
-        seen_ids.add(item_id)
-        seen_questions.add(normalized_question)
-
-        group = item.get("group", "")
-        if not isinstance(group, str):
-            raise ValueError(f"responses[{index}].group must be text")
-        status = _required_text(item.get("answer_status", "reported"),
-                                f"responses[{index}].answer_status")
-        refs = item.get("source_refs", [])
-        if not isinstance(refs, list) or any(not isinstance(ref, str) for ref in refs):
-            raise ValueError(f"responses[{index}].source_refs must be a list of text")
-        records.append({
-            "id": item_id, "group": group.strip(), "question": question,
-            "answer": answer, "options": options, "answer_status": status,
-            "source_refs": refs,
-        })
-        questionnaire[question] = options
-    return agent_id, profile, records, questionnaire
+        if question in seen_questions:
+            raise ValueError(f"Duplicate question at responses[{index}]")
+        seen_questions.add(question)
+        records.append({"question": question, "answer": answer})
+    return agent_id, profile, records
 
 
 def build(source: Path, population: Path) -> Path:
     """Validate and create population/<id>; never overwrite an existing agent."""
-    agent_id, profile, records, questionnaire = _validate_input(
-        json.loads(source.read_text())
-    )
+    questionnaire = json.loads(QUESTIONNAIRE.read_text())
+    agent_id, profile, records = _validate_input(json.loads(source.read_text()), questionnaire)
     destination = population / agent_id
     if destination.exists():
         raise FileExistsError(f"Agent already exists: {destination}")
@@ -85,30 +60,22 @@ def build(source: Path, population: Path) -> Path:
     name = profile.get("first_name", "Respondent")
     nodes, embeddings = [], {}
     for index, record in enumerate(records):
-        group = f" ({record['group']})" if record["group"] else ""
-        content = (
-            f"Survey question{group}: {record['question']}\n"
-            f"{name}'s response ({record['answer_status']}): {record['answer']}"
-        )
+        content = f"Survey question: {record['question']}\n{name}'s response: {record['answer']}"
         nodes.append({
             "node_id": index, "node_type": "observation", "content": content,
-            "importance": 80 if record["answer_status"] == "reported" else 60,
+            "importance": 80,
             "created": index + 1, "last_retrieved": index + 1,
             "pointer_id": None,
         })
         embeddings[content] = get_text_embedding(content)
 
-    counts = dict(Counter(record["answer_status"] for record in records))
-    meta = {
-        "id": agent_id, "agent_type": "survey", "questionnaire": "questionnaire.json",
-        "embedding_backend": EMBEDDING_BACKEND, "item_counts": counts,
-    }
+    meta = {"id": agent_id, "agent_type": "survey", "ready": True,
+            "embedding_backend": EMBEDDING_BACKEND, "item_count": len(records)}
     destination.mkdir(parents=True)
     memory_dir = destination / "memory_stream"
     memory_dir.mkdir()
     for name, data in (
         ("meta.json", meta), ("scratch.json", profile),
-        ("survey_responses.json", records), ("questionnaire.json", questionnaire),
         ("memory_stream/nodes.json", nodes),
         ("memory_stream/embeddings.json", embeddings),
     ):

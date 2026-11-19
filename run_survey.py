@@ -28,7 +28,7 @@ def main():
     parser.add_argument(
         "--questionnaire",
         type=Path,
-        help="question-to-options JSON (default: the agent's questionnaire.json)",
+        help="question-to-options JSON (default: shared LSMS questionnaire)",
     )
     parser.add_argument("--output", type=Path, default=ROOT / "survey_run")
     parser.add_argument("--batch-size", type=int, default=4)
@@ -40,7 +40,13 @@ def main():
     agent_folder = args.population / args.agent_id
     if not (agent_folder / "scratch.json").is_file():
         parser.error(f"Survey agent not found: {agent_folder}")
-    questionnaire_path = args.questionnaire or agent_folder / "questionnaire.json"
+    try:
+        meta = json.loads((agent_folder / "meta.json").read_text())
+    except (OSError, json.JSONDecodeError) as exc:
+        parser.error(f"Could not load survey agent metadata: {exc}")
+    if not meta.get("ready"):
+        parser.error(f"Survey agent has no respondent answers: {agent_folder}")
+    questionnaire_path = args.questionnaire or ROOT / "environment/survey/lsms_like_questionnaire.json"
     try:
         with questionnaire_path.open() as stream:
             questionnaire = json.load(stream)

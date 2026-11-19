@@ -148,46 +148,49 @@ The first run downloads the small embedding model (about 90 MB). After that, thi
 
 #### Create a survey agent from answered questions
 
-`agent_bank/populations/survey_agents/` is empty until you create an agent.
-Use [the example input](examples/survey_agent.example.json) as a template. It
-needs an `id`, an optional `profile` object, and a non-empty `responses` list.
-Each response needs a unique `id`, question text, an answer that exactly matches
-one of its `options`, and at least two options. `group` and `answer_status` are
-optional. Use one input file per respondent:
+The [survey agent folder](agent_bank/populations/survey_agents/README.md) has a
+blank `lsms_template` with the same four files as the interview agent. The
+[LSMS-inspired questionnaire](environment/survey/lsms_like_questionnaire.json)
+provides 55 question and option sets. To create a respondent, supply an `id`,
+an optional `profile`, and actual answers to a subset of those questions:
+
+```json
+{
+  "id": "respondent-001",
+  "profile": {"first_name": "Respondent"},
+  "responses": [
+    {"question": "What age group are you in?", "answer": "25-34"}
+  ]
+}
+```
+
+Use one input file per respondent:
 
 ```bash
 python build_survey_agent.py path/to/your-respondent.json
 ```
 
-This creates `agent_bank/populations/survey_agents/<id>/` with
-`survey_responses.json`, `scratch.json`, `meta.json`, `questionnaire.json`, and
-`memory_stream/{nodes,embeddings}.json`. The builder embeds each survey
-question/answer memory with the `EMBEDDING_BACKEND` in
+This creates `agent_bank/populations/survey_agents/<id>/` with only
+`meta.json`, `scratch.json`, and `memory_stream/{nodes,embeddings}.json`.
+The builder checks questions and answers against the LSMS questionnaire and
+embeds each answered question as a memory with the `EMBEDDING_BACKEND` in
 `simulation_engine/settings.py`; use the same backend when running the agent.
 It refuses to overwrite an existing ID. To build a population, run it once
 for each respondent's input file.
 
 There are two ways to use the generated agent:
 
-- `python main.py survey --agent-id <id>` loads `SurveyAgent`. It uses stored
-  question/answer pairs as context to predict an answer to a new categorical
-  question. `SurveyAgent.recorded_resp` returns an exact stored answer without
-  an LLM call.
-- `python run_survey.py --agent-id <id>` loads the memory-based
-  `GenerativeAgent` through `Survey.survey` and asks the first four questions
-  from that agent's `questionnaire.json`. Add `--all` for every question. It
+- `python main.py survey --agent-id <id>` loads the same `GenerativeAgent` class
+  used for interview agents and lets you ask categorical questions.
+- `python run_survey.py --agent-id <id>` loads that agent through `Survey.survey`
+  and asks the first four questions from the shared LSMS questionnaire. Add
+  `--all` for every question. It
   saves results to `survey_run/responses.csv`.
 
-The standalone [LSMS-inspired questionnaire](environment/survey/lsms_like_questionnaire.json)
-remains as a question template; it contains no respondent answers. For an
-independent accuracy test, keep held-out answers out of the agent's input and
-use the [survey evaluation workflow](evaluation/README.md).
-
-To compare predictions with observed survey answers, use the
-[survey evaluation workflow](evaluation/README.md). It produces question-level
-answer distributions and total variation distance (TVD). The bundled synthetic
-agent is only a format example; population accuracy needs multiple agents and
-independent observed respondents.
+The questionnaire and blank template contain no respondent answers. For an
+independent accuracy test, keep held-out answers out of each agent's input and
+use the [survey evaluation workflow](evaluation/README.md). It compares answer
+distributions using total variation distance (TVD).
 
 #### Using it from T3 Code
 
@@ -224,7 +227,7 @@ Tips:
   - `populations/`: Contains pre-generated agents
     - `gss_agents/`: Demographic agent data based on the GSS
     - `interview_agent/`: Example agent data (see [Interview Agent](#sample-agent))
-    - `survey_agents/`: Generated agents built from answered questionnaires
+    - `survey_agents/`: Blank LSMS template and agents built from actual answers
 - `build_survey_agent.py`: Creates one survey agent from a JSON input file
 - `README.md`: This readme file
 - `requirements.txt`: List of Python dependencies

@@ -85,48 +85,36 @@ class SurveyEvaluationTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Answer outside options"):
             score(self.questions, observed, predicted, self.root / "output")
 
-    def test_predict_withholds_all_evaluation_items_across_batches(self):
-        items = [
-            {"id": f"q{i}", "question": f"Target question {i}?", "answer": "Yes",
-             "group": "target"}
-            for i in range(5)
-        ] + [{"id": "context", "question": "Context question?", "answer": "No",
-              "group": "context"}]
-        self.questions.write_text(json.dumps([
-            {"id": f"q{i}", "text": f"Target question {i}?", "options": ["Yes", "No"]}
-            for i in range(5)
-        ]))
+    def test_predict_rejects_evaluation_question_in_memory(self):
         folder = self.root / "agent"
-        folder.mkdir()
-        (folder / "meta.json").write_text(json.dumps({"id": "a1"}))
-        (folder / "survey_responses.json").write_text(json.dumps(items))
+        (folder / "memory_stream").mkdir(parents=True)
+        (folder / "meta.json").write_text(json.dumps({"id": "a1", "ready": True}))
+        (folder / "memory_stream/nodes.json").write_text(json.dumps([
+            {"content": "Survey question: Would you choose A?\nResponse: Yes"}
+        ]))
         agents = self.root / "agents.csv"
         write_csv(agents, ["agent_id", "folder", "cohort"], [
             {"agent_id": "a1", "folder": "agent", "cohort": "c"}
         ])
+        with self.assertRaisesRegex(ValueError, "appears in agent memory"):
+            predict(self.questions, agents, self.root / "predicted.csv")
 
-        prompts = []
-
-        def fake_request(prompt):
-            prompts.append(prompt)
-            profile = prompt.split("<prior_survey_answers>\n", 1)[1].split(
-                "\n</prior_survey_answers>", 1
-            )[0]
-            prior = json.loads(profile)
-            self.assertEqual([item["question"] for item in prior], ["Context question?"])
-            targets = json.loads(prompt.split("<questions>\n", 1)[1].split(
-                "\n</questions>", 1
-            )[0])
-            return json.dumps({"responses": ["Yes"] * len(targets)})
-
-        with patch("genagents.survey_agent.gpt_request", side_effect=fake_request):
-            count = predict(self.questions, agents, self.root / "predicted.csv")
-        self.assertEqual(count, 5)
-        self.assertEqual(len(prompts), 2)
-        with (self.root / "predicted.csv").open(newline="") as stream:
-            rows = list(csv.DictReader(stream))
-        self.assertEqual(len(rows), 5)
-        self.assertEqual({row["answer"] for row in rows}, {"Yes"})
+    def test_predict_uses_memory_agent_for_held_out_question(self):
+        folder = self.root / "agent"
+        (folder / "memory_stream").mkdir(parents=True)
+        (folder / "meta.json").write_text(json.dumps({"id": "a1", "ready": True}))
+        (folder / "memory_stream/nodes.json").write_text(json.dumps([
+            {"content": "Survey question: What age group are you in?\nResponse: 25-34"}
+        ]))
+        agents = self.root / "agents.csv"
+        write_csv(agents, ["agent_id", "folder", "cohort"], [
+            {"agent_id": "a1", "folder": "agent", "cohort": "c"}
+        ])
+        with patch("genagents.genagents.GenerativeAgent") as agent_class:
+            agent_class.return_value.categorical_resp.return_value = {"responses": ["Yes"]}
+            self.assertEqual(predict(self.questions, agents, self.root / "predicted.csv"), 1)
+            agent_class.return_value.categorical_resp.assert_called_once_with(
+                {"Would you choose A?": ["Yes", "No"]})
 
 
 if __name__ == "__main__":

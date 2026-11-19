@@ -30,7 +30,9 @@ answer options:
 
 **`agents.csv`** lists the survey agents to simulate. `folder` is relative to
 the CSV's directory, or absolute. `weight` is optional and defaults to 1.
-Each agent must have `meta.json` and `survey_responses.json` in its folder.
+Each agent must have the interview-style `meta.json`, `scratch.json`, and
+`memory_stream/{nodes,embeddings}.json` files in its folder. Build each agent
+from training answers only; `lsms_template` has no answers and cannot be scored.
 
 ```csv
 agent_id,folder,cohort,weight
@@ -68,16 +70,12 @@ python -m evaluation.survey score \
   --output-dir evaluation/output/score
 ```
 
-Prediction uses `SurveyAgent.categorical_resp`, never its recorded-answer
-lookup or the separate `Survey.survey` memory-based runner. It withholds **all**
-evaluation question IDs and matching question text
-from every agent's prior-answer prompt. Add `--exclude-group GROUP` to the
-predict command to withhold an entire response group as well; repeat the flag
-for multiple groups. Build agents from training-only survey answers when
-possible, and check for paraphrases or other fields that reveal the held-out
-answers. A response already present in `survey_responses.json` is not an
-independent test observation merely because it was copied into `observed.csv`.
-Prediction sends the remaining prior answers to the configured LLM backend;
+Prediction uses the same memory-based `GenerativeAgent.categorical_resp` as
+the survey runner. It rejects agents whose memory contains the exact text of
+an evaluation question. Build agents from training-only answers and check for
+paraphrases or profile fields that reveal held-out answers. An answer already
+embedded in an agent is not an independent test observation. Prediction sends
+the profile and retrieved memories to the configured LLM backend;
 check that backend before using private participant data.
 
 `predicted.csv` has `agent_id,question_id,cohort,answer,weight`. The scorer
