@@ -219,6 +219,12 @@ to the LLM in blocks of up to four new questions, withholding exact target
 items. To reproduce the paper's survey condition, use actual survey responses
 in place of the synthetic answers.
 
+To compare predictions with observed survey answers, use the
+[survey evaluation workflow](evaluation/README.md). It produces question-level
+answer distributions and total variation distance (TVD). The bundled synthetic
+agent is only a format example; population accuracy needs multiple agents and
+independent observed respondents.
+
 #### Using it from T3 Code
 
 [T3 Code](https://github.com/pingdotgg/t3code) runs Claude Code or Codex in threads on your machine. Open this folder as a project, start a thread, and ask the agent to do the work in plain language. It writes and runs the Python for you. The simulation's own LLM calls go through `claude` or `codex` too, so the whole run uses your subscription. Example prompts:

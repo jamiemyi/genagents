@@ -14,5 +14,5 @@ openai = ["openai"]
 local = ["sentence-transformers"]
 
 [tool.setuptools.packages.find]
-include = ["genagents*", "simulation_engine*", "environment*"]
+include = ["genagents*", "simulation_engine*", "environment*", "evaluation*"]
 namespaces = true

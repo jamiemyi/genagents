@@ -1,7 +1,7 @@
 """Survey-style simulation grounded in stored question/answer pairs.
 
-This mirrors the paper's survey prompt structure, but the bundled example data
-is converted from an interview and profile, not an original survey instrument.
+The bundled example data is converted from an interview and profile. Other
+survey agents may instead use observed survey responses.
 """
 
 import json
@@ -88,15 +88,14 @@ class SurveyAgent:
         for start in range(0, len(entries), 4):
             block = entries[start:start + 4]
             prompt = (
-                "You are simulating a synthetic survey profile based on one "
-                "person's interview. Use the prior answers below to predict "
-                "how this profile would answer new "
+                "You are simulating a survey respondent. Use the respondent's "
+                "prior answers below to predict how they would answer new "
                 "questions. Reply with valid JSON only: an object with a "
                 "'responses' array in question order. Copy one listed option "
                 "verbatim for each answer.\n\n"
-                "<synthetic_survey_profile>\n"
+                "<prior_survey_answers>\n"
                 + json.dumps(prior, ensure_ascii=False)
-                + "\n</synthetic_survey_profile>\n\n"
+                + "\n</prior_survey_answers>\n\n"
                 "<questions>\n"
                 + json.dumps(
                     [{"question": question, "options": options} for question, options in block],
