@@ -1,8 +1,8 @@
-"""Run the bundled survey agent using the project's Survey environment.
+"""Run a generated survey agent using the project's Survey environment.
 
 From the repository root:
-    python run_survey.py                 # first four items
-    python run_survey.py --all            # full 55-item questionnaire
+    python run_survey.py --agent-id respondent-001
+    python run_survey.py --agent-id respondent-001 --all
 """
 
 import argparse
@@ -15,12 +15,11 @@ from environment.survey.survey import Survey
 
 
 ROOT = Path(__file__).resolve().parent
-DEFAULT_AGENT_ID = "01fd7d2a-0357-4c1b-9f3e-8eade2d537ae"
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--agent-id", default=DEFAULT_AGENT_ID)
+    parser.add_argument("--agent-id", required=True, help="generated survey agent ID")
     parser.add_argument(
         "--population",
         type=Path,
@@ -29,7 +28,7 @@ def main():
     parser.add_argument(
         "--questionnaire",
         type=Path,
-        default=ROOT / "environment/survey/lsms_like_questionnaire.json",
+        help="question-to-options JSON (default: the agent's questionnaire.json)",
     )
     parser.add_argument("--output", type=Path, default=ROOT / "survey_run")
     parser.add_argument("--batch-size", type=int, default=4)
@@ -38,8 +37,15 @@ def main():
 
     if args.batch_size < 1:
         parser.error("--batch-size must be a positive integer")
-    with args.questionnaire.open() as stream:
-        questionnaire = json.load(stream)
+    agent_folder = args.population / args.agent_id
+    if not (agent_folder / "scratch.json").is_file():
+        parser.error(f"Survey agent not found: {agent_folder}")
+    questionnaire_path = args.questionnaire or agent_folder / "questionnaire.json"
+    try:
+        with questionnaire_path.open() as stream:
+            questionnaire = json.load(stream)
+    except (OSError, json.JSONDecodeError) as exc:
+        parser.error(f"Could not load questionnaire {questionnaire_path}: {exc}")
     if not isinstance(questionnaire, dict) or not questionnaire:
         parser.error("questionnaire must be a non-empty question-to-options object")
 

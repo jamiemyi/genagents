@@ -34,7 +34,7 @@ Each agent must have `meta.json` and `survey_responses.json` in its folder.
 
 ```csv
 agent_id,folder,cohort,weight
-01fd7d2a-0357-4c1b-9f3e-8eade2d537ae,../../agent_bank/populations/survey_agents/01fd7d2a-0357-4c1b-9f3e-8eade2d537ae,demo,1
+respondent-001,../../agent_bank/populations/survey_agents/respondent-001,demo,1
 ```
 
 **`observed.csv`** has one observed answer per participant and question. Use
@@ -48,8 +48,7 @@ person-1,q1,demo,Yes,1
 
 The observed and simulated samples should represent the same population,
 cohort, time period, question wording, and options. Use survey sampling weights
-when available. A single agent, including this repo's synthetic demo agent,
-does not establish population accuracy.
+when available. A single agent does not establish population accuracy.
 
 ## Predict and score
 

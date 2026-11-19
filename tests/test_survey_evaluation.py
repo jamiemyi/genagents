@@ -109,8 +109,8 @@ class SurveyEvaluationTest(unittest.TestCase):
 
         def fake_request(prompt):
             prompts.append(prompt)
-            profile = prompt.split("<synthetic_survey_profile>\n", 1)[1].split(
-                "\n</synthetic_survey_profile>", 1
+            profile = prompt.split("<prior_survey_answers>\n", 1)[1].split(
+                "\n</prior_survey_answers>", 1
             )[0]
             prior = json.loads(profile)
             self.assertEqual([item["question"] for item in prior], ["Context question?"])

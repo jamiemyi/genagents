@@ -6,5 +6,6 @@ embeddings.json.bak
 .venv/
 /evaluation/data/
 /evaluation/output/
+/survey_run/
 *.egg-info/
 build/

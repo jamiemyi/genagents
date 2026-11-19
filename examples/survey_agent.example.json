@@ -1,0 +1,25 @@
+{
+  "id": "respondent-001",
+  "profile": {
+    "first_name": "Avery",
+    "last_name": "Example"
+  },
+  "responses": [
+    {
+      "id": "housing.tenure",
+      "group": "housing",
+      "question": "Do you own or rent your home?",
+      "answer": "Rent",
+      "options": ["Own", "Rent", "Other"],
+      "answer_status": "reported"
+    },
+    {
+      "id": "transport.commute",
+      "group": "transport",
+      "question": "How do you usually commute?",
+      "answer": "Public transit",
+      "options": ["Car", "Public transit", "Walk or bike", "Other"],
+      "answer_status": "reported"
+    }
+  ]
+}

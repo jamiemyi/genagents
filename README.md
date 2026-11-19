@@ -146,82 +146,42 @@ To use the code from another project folder instead, install this repo there in 
 
 The first run downloads the small embedding model (about 90 MB). After that, this example takes about 30 seconds and prints something like `['Can be trusted', 'Pretty happy']` followed by a few sentences about drawing and painting.
 
-#### Survey-style agent from the sample interview
+#### Create a survey agent from answered questions
 
-Following the [paper's survey prompt structure](https://arxiv.org/pdf/2411.10109),
-the `survey_agents` population contains a separate representation of the same
-sample person as survey question/answer records. The example uses an original
-55-item, [LSMS-inspired](https://documents1.worldbank.org/curated/en/452741468778781879/pdf/multi-page.pdf) household questionnaire covering demographics, education,
-work, migration, housing, consumption, health, finances, and assets. Answers
-are marked `reported` (stated in the source), `inferred` (a close implication),
-or `imagined` (a plausible answer supplied for this example). **This is a
-synthetic reconstruction, not a survey administered to the person or an official
-LSMS instrument.** The paper's survey-only results do not apply to it.
-
-Rebuild the files from the interview agent with:
+`agent_bank/populations/survey_agents/` is empty until you create an agent.
+Use [the example input](examples/survey_agent.example.json) as a template. It
+needs an `id`, an optional `profile` object, and a non-empty `responses` list.
+Each response needs a unique `id`, question text, an answer that exactly matches
+one of its `options`, and at least two options. `group` and `answer_status` are
+optional. Use one input file per respondent:
 
 ```bash
-python build_survey_agent.py \
-  agent_bank/populations/interview_agent/01fd7d2a-0357-4c1b-9f3e-8eade2d537ae \
-  agent_bank/populations/survey_agents/01fd7d2a-0357-4c1b-9f3e-8eade2d537ae
+python build_survey_agent.py path/to/your-respondent.json
 ```
 
-Run the first four LSMS-style questions with `python run_survey.py`. Use
-`python run_survey.py --all` to run the full questionnaire. Each batch is saved
-under `survey_run/` as `responses.csv`. This original runner loads the survey
-folder as a `GenerativeAgent` and asks the LLM to answer using its memory stream.
+This creates `agent_bank/populations/survey_agents/<id>/` with
+`survey_responses.json`, `scratch.json`, `meta.json`, `questionnaire.json`, and
+`memory_stream/{nodes,embeddings}.json`. The builder embeds each survey
+question/answer memory with the `EMBEDDING_BACKEND` in
+`simulation_engine/settings.py`; use the same backend when running the agent.
+It refuses to overwrite an existing ID. To build a population, run it once
+for each respondent's input file.
 
-The survey folder also contains `survey_responses.json`, which `SurveyAgent`
-uses directly for recorded answers or predictions from prior question/answer
-pairs. Its memory stream contains the original survey nodes and embeddings.
-The builder copies those vectors from referenced interview memories, so they
-are not embeddings of the survey question/answer text itself.
+There are two ways to use the generated agent:
 
-`Survey.survey` takes the same question-to-options dictionary as
-`GenerativeAgent.categorical_resp`. Load the bundled questions and ask the
-memory-based agent to answer:
+- `python main.py survey --agent-id <id>` loads `SurveyAgent`. It uses stored
+  question/answer pairs as context to predict an answer to a new categorical
+  question. `SurveyAgent.recorded_resp` returns an exact stored answer without
+  an LLM call.
+- `python run_survey.py --agent-id <id>` loads the memory-based
+  `GenerativeAgent` through `Survey.survey` and asks the first four questions
+  from that agent's `questionnaire.json`. Add `--all` for every question. It
+  saves results to `survey_run/responses.csv`.
 
-```python
-import json
-from environment.survey.survey import Survey
-
-survey = Survey()
-survey.load_agents([{
-    "population": "agent_bank/populations/survey_agents",
-    "agent_id": "01fd7d2a-0357-4c1b-9f3e-8eade2d537ae"
-}])
-with open("environment/survey/lsms_like_questionnaire.json") as f:
-    questions = json.load(f)
-answers = survey.survey(questions)
-print(answers)
-survey.save("survey_run")
-```
-
-To return an exact stored answer without calling an LLM, use `SurveyAgent`:
-
-```python
-from genagents.survey_agent import SurveyAgent
-
-agent = SurveyAgent(
-    "agent_bank/populations/survey_agents/01fd7d2a-0357-4c1b-9f3e-8eade2d537ae"
-)
-result = agent.recorded_resp({
-    "What age group are you in?": ["18-24", "25-34", "35-44", "45-54", "55 or older"]
-})
-print(result)
-
-# Predict an answer to a new question from the stored survey profile:
-result = agent.categorical_resp({
-    "Generally speaking, would you say most people can be trusted?":
-        ["Can be trusted", "Can't be too careful", "Depends"]
-})
-print(result)
-```
-
-When predicting, `SurveyAgent` passes its stored question/answer pairs
-to the LLM in blocks of up to four new questions, withholding exact target
-items. To reproduce the paper's survey condition, use actual survey responses
-in place of the synthetic answers.
+The standalone [LSMS-inspired questionnaire](environment/survey/lsms_like_questionnaire.json)
+remains as a question template; it contains no respondent answers. For an
+independent accuracy test, keep held-out answers out of the agent's input and
+use the [survey evaluation workflow](evaluation/README.md).
 
 To compare predictions with observed survey answers, use the
 [survey evaluation workflow](evaluation/README.md). It produces question-level
@@ -264,6 +224,8 @@ Tips:
   - `populations/`: Contains pre-generated agents
     - `gss_agents/`: Demographic agent data based on the GSS
     - `interview_agent/`: Example agent data (see [Interview Agent](#sample-agent))
+    - `survey_agents/`: Generated agents built from answered questionnaires
+- `build_survey_agent.py`: Creates one survey agent from a JSON input file
 - `README.md`: This readme file
 - `requirements.txt`: List of Python dependencies
 
@@ -338,8 +300,8 @@ To have a continuing conversation in the terminal, run `main.py`:
 python main.py interview                 # Example interview agent (the default)
 python main.py jamie                     # Jamie's profile
 python main.py gss                       # First GSS agent by ID
-python main.py survey                    # Ask the survey agent a categorical question
-python main.py survey --agent-id 01fd7d2a-0357-4c1b-9f3e-8eade2d537ae
+python main.py survey                    # First survey agent, after you create one
+python main.py survey --agent-id respondent-001
 python main.py --list-agents --limit 20  # Show GSS names and IDs
 python main.py --list-agents --search Eric
 python main.py gss --agent-id 05ced490-251d-4661-a324-502952c729df
