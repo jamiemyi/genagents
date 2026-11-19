@@ -5,7 +5,6 @@ from simulation_engine.settings import *
 from simulation_engine.global_methods import *
 from environment.environment import Environment 
 from genagents.genagents import GenerativeAgent
-from genagents.survey_agent import SurveyAgent
 
 
 class Survey(Environment): 
@@ -38,21 +37,13 @@ class Survey(Environment):
     write_list_of_list_to_csv(packaged_responses, os.path.join(save_dir, "responses.csv"))
 
 
-  def _administer_to_agent(self, agent_pid, questions, mode):
+  def _administer_to_agent(self, agent_pid, questions):
     population = self.agent_registry[agent_pid]["population"]
     agent_id = self.agent_registry[agent_pid]["agent_id"]
 
-    agent_folder = os.path.join(population, agent_id)
+    agent = GenerativeAgent(population, agent_id)
     print (f"Generating {agent_pid}'s response")
-    if os.path.isfile(os.path.join(agent_folder, "survey_responses.json")):
-      agent = SurveyAgent(agent_folder)
-      output = (agent.recorded_resp(questions) if mode == "recorded"
-                else agent.categorical_resp(questions))
-    else:
-      if mode == "recorded":
-        raise ValueError(f"Recorded answers are unavailable for {agent_folder}")
-      agent = GenerativeAgent(population, agent_id)
-      output = agent.categorical_resp(questions)
+    output = agent.categorical_resp(questions)
     output["agent_pid"] = agent_pid
     print (output)
     return output
@@ -69,9 +60,7 @@ class Survey(Environment):
     return list(self.agent_registry)
 
 
-  def survey(self, questions, inclusion_criteria={}, num_threads=50, mode="predict"):
-    if mode not in ("predict", "recorded"):
-      raise ValueError("mode must be 'predict' or 'recorded'")
+  def survey(self, questions, inclusion_criteria={}, num_threads=50):
     filtered_agents = self._filter_agents(inclusion_criteria)
 
     if not filtered_agents:
@@ -79,7 +68,7 @@ class Survey(Environment):
       return []
 
     with ThreadPoolExecutor(max_workers=num_threads) as executor:
-      futures = [executor.submit(self._administer_to_agent, agent_pid, questions, mode)
+      futures = [executor.submit(self._administer_to_agent, agent_pid, questions)
                  for agent_pid in filtered_agents]
       outputs = [future.result() for future in futures]
 

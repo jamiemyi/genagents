@@ -3,7 +3,6 @@
 From the repository root:
     python run_survey.py                 # first four items
     python run_survey.py --all            # full 55-item questionnaire
-    python run_survey.py --mode predict   # ask the LLM to predict answers
 """
 
 import argparse
@@ -35,8 +34,6 @@ def main():
     parser.add_argument("--output", type=Path, default=ROOT / "survey_run")
     parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--all", action="store_true", help="run all questionnaire items")
-    parser.add_argument("--mode", choices=("recorded", "predict"), default="recorded",
-                        help="use stored answers or predict with the LLM (default: recorded)")
     args = parser.parse_args()
 
     if args.batch_size < 1:
@@ -58,7 +55,7 @@ def main():
 
     for start in range(0, len(selected), args.batch_size):
         batch = dict(selected[start:start + args.batch_size])
-        survey.survey(batch, num_threads=1, mode=args.mode)
+        survey.survey(batch, num_threads=1)
         survey.save(str(args.output))
         print(f"Saved {min(start + len(batch), len(selected))}/{len(selected)} responses")
 

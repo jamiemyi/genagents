@@ -70,7 +70,8 @@ python -m evaluation.survey score \
 ```
 
 Prediction uses `SurveyAgent.categorical_resp`, never its recorded-answer
-lookup. It withholds **all** evaluation question IDs and matching question text
+lookup or the separate `Survey.survey` memory-based runner. It withholds **all**
+evaluation question IDs and matching question text
 from every agent's prior-answer prompt. Add `--exclude-group GROUP` to the
 predict command to withhold an entire response group as well; repeat the flag
 for multiple groups. Build agents from training-only survey answers when

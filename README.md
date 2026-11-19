@@ -168,18 +168,18 @@ python build_survey_agent.py \
 
 Run the first four LSMS-style questions with `python run_survey.py`. Use
 `python run_survey.py --all` to run the full questionnaire. Each batch is saved
-under `survey_run/` as `responses.csv`. These commands return stored answers;
-`--mode predict` asks the LLM to predict instead.
+under `survey_run/` as `responses.csv`. This original runner loads the survey
+folder as a `GenerativeAgent` and asks the LLM to answer using its memory stream.
 
-Survey agents read `survey_responses.json` directly. Their `memory_stream/nodes.json`
-is `[]` and `memory_stream/embeddings.json` is `{}`; they do not use vector
-retrieval. Rebuilding the survey agent preserves those empty files. Running a
-survey writes answers to `survey_run/responses.csv`; it does not add those
-answers to the agent's stored profile automatically.
+The survey folder also contains `survey_responses.json`, which `SurveyAgent`
+uses directly for recorded answers or predictions from prior question/answer
+pairs. Its memory stream contains the original survey nodes and embeddings.
+The builder copies those vectors from referenced interview memories, so they
+are not embeddings of the survey question/answer text itself.
 
 `Survey.survey` takes the same question-to-options dictionary as
-`GenerativeAgent.categorical_resp`. Load the bundled questions and return the
-stored answers:
+`GenerativeAgent.categorical_resp`. Load the bundled questions and ask the
+memory-based agent to answer:
 
 ```python
 import json
@@ -192,29 +192,33 @@ survey.load_agents([{
 }])
 with open("environment/survey/lsms_like_questionnaire.json") as f:
     questions = json.load(f)
-answers = survey.survey(questions, mode="recorded")
+answers = survey.survey(questions)
 print(answers)
 survey.save("survey_run")
 ```
 
-To predict answers to new categorical questions from the synthetic profile:
+To return an exact stored answer without calling an LLM, use `SurveyAgent`:
 
 ```python
-from environment.survey.survey import Survey
+from genagents.survey_agent import SurveyAgent
 
-survey = Survey()
-survey.load_agents([{
-    "population": "agent_bank/populations/survey_agents",
-    "agent_id": "01fd7d2a-0357-4c1b-9f3e-8eade2d537ae"
-}])
-result = survey.survey({
+agent = SurveyAgent(
+    "agent_bank/populations/survey_agents/01fd7d2a-0357-4c1b-9f3e-8eade2d537ae"
+)
+result = agent.recorded_resp({
+    "What age group are you in?": ["18-24", "25-34", "35-44", "45-54", "55 or older"]
+})
+print(result)
+
+# Predict an answer to a new question from the stored survey profile:
+result = agent.categorical_resp({
     "Generally speaking, would you say most people can be trusted?":
         ["Can be trusted", "Can't be too careful", "Depends"]
 })
 print(result)
 ```
 
-In prediction mode, the survey agent passes its stored question/answer pairs
+When predicting, `SurveyAgent` passes its stored question/answer pairs
 to the LLM in blocks of up to four new questions, withholding exact target
 items. To reproduce the paper's survey condition, use actual survey responses
 in place of the synthetic answers.

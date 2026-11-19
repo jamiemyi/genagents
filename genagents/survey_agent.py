@@ -1,7 +1,7 @@
 """Survey-style simulation grounded in stored question/answer pairs.
 
-The bundled example data is converted from an interview and profile. Other
-survey agents may instead use observed survey responses.
+This mirrors the paper's survey prompt structure, but the bundled example data
+is converted from an interview and profile, not an original survey instrument.
 """
 
 import json
@@ -54,7 +54,7 @@ class SurveyAgent:
         ]
 
     def recorded_resp(self, questions):
-        """Return stored answers by question text without making an LLM call."""
+        """Return stored answers by survey item id without making an LLM call."""
         by_question = {_normalized(item["question"]): item for item in self.items}
         answers = []
         for question, options in questions.items():
@@ -88,14 +88,15 @@ class SurveyAgent:
         for start in range(0, len(entries), 4):
             block = entries[start:start + 4]
             prompt = (
-                "You are simulating a survey respondent. Use the respondent's "
-                "prior answers below to predict how they would answer new "
+                "You are simulating a synthetic survey profile based on one "
+                "person's interview. Use the prior answers below to predict "
+                "how this profile would answer new "
                 "questions. Reply with valid JSON only: an object with a "
                 "'responses' array in question order. Copy one listed option "
                 "verbatim for each answer.\n\n"
-                "<prior_survey_answers>\n"
+                "<synthetic_survey_profile>\n"
                 + json.dumps(prior, ensure_ascii=False)
-                + "\n</prior_survey_answers>\n\n"
+                + "\n</synthetic_survey_profile>\n\n"
                 "<questions>\n"
                 + json.dumps(
                     [{"question": question, "options": options} for question, options in block],

@@ -74,6 +74,8 @@ ITEMS = [
 def build(source: Path, destination: Path, questionnaire_path: Path):
     scratch = json.loads((source / "scratch.json").read_text())
     nodes = json.loads((source / "memory_stream" / "nodes.json").read_text())
+    source_embeddings = json.loads((source / "memory_stream" / "embeddings.json").read_text())
+    source_nodes = {node["node_id"]: node for node in nodes}
     node_ids = {node["node_id"] for node in nodes}
     source_meta = json.loads((source / "meta.json").read_text())
     records, questions, seen = [], {}, set()
@@ -111,9 +113,29 @@ def build(source: Path, destination: Path, questionnaire_path: Path):
 
     memory_dir = destination / "memory_stream"
     memory_dir.mkdir(parents=True, exist_ok=True)
-    # SurveyAgent uses survey_responses.json directly; no vector memory is needed.
-    (memory_dir / "nodes.json").write_text("[]\n")
-    (memory_dir / "embeddings.json").write_text("{}\n")
+    survey_nodes, embeddings = [], {}
+    name = scratch.get("first_name", "Respondent")
+    fallback_node = next(
+        node for node in source_nodes.values()
+        if "Joon:" in node["content"] and node["content"].strip()
+    )
+    for node_id, record in enumerate(records):
+        content = (
+            f"Survey question ({record['group']}): {record['question']}\n"
+            f"{name}'s synthetic response ({record['answer_status']}): {record['answer']}"
+        )
+        survey_nodes.append({
+            "node_id": node_id, "node_type": "observation", "content": content,
+            "importance": 80 if record["answer_status"] == "reported" else 60,
+            "created": node_id + 1, "last_retrieved": node_id + 1,
+            "pointer_id": None,
+        })
+        source_ref = next((ref for ref in record["source_refs"]
+                           if ref.startswith("interview:")), None)
+        source_node = source_nodes[int(source_ref.split(":")[1])] if source_ref else fallback_node
+        embeddings[content] = source_embeddings[source_node["content"]]
+    (memory_dir / "nodes.json").write_text(json.dumps(survey_nodes, indent=2) + "\n")
+    (memory_dir / "embeddings.json").write_text(json.dumps(embeddings) + "\n")
     return meta
 
 
