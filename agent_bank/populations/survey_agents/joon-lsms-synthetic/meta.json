@@ -1,0 +1,8 @@
+{
+  "id": "joon-lsms-synthetic",
+  "agent_type": "survey",
+  "ready": true,
+  "embedding_backend": "local",
+  "item_count": 55,
+  "data_origin": "synthetic answers inferred or generated from interview agent 01fd7d2a-0357-4c1b-9f3e-8eade2d537ae; not respondent-reported"
+}

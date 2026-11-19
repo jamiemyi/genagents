@@ -25,6 +25,9 @@ def _validate_input(data, questionnaire):
     profile = data.get("profile", {})
     if not isinstance(profile, dict):
         raise ValueError("profile must be a JSON object")
+    data_origin = data.get("data_origin", "respondent_reported")
+    if not isinstance(data_origin, str) or not data_origin.strip():
+        raise ValueError("data_origin must be non-empty text")
     responses = data.get("responses")
     if not isinstance(responses, list) or not responses:
         raise ValueError("responses must be a non-empty list")
@@ -44,13 +47,14 @@ def _validate_input(data, questionnaire):
             raise ValueError(f"Duplicate question at responses[{index}]")
         seen_questions.add(question)
         records.append({"question": question, "answer": answer})
-    return agent_id, profile, records
+    return agent_id, profile, records, data_origin.strip()
 
 
 def build(source: Path, population: Path) -> Path:
     """Validate and create population/<id>; never overwrite an existing agent."""
     questionnaire = json.loads(QUESTIONNAIRE.read_text())
-    agent_id, profile, records = _validate_input(json.loads(source.read_text()), questionnaire)
+    agent_id, profile, records, data_origin = _validate_input(
+        json.loads(source.read_text()), questionnaire)
     destination = population / agent_id
     if destination.exists():
         raise FileExistsError(f"Agent already exists: {destination}")
@@ -70,7 +74,8 @@ def build(source: Path, population: Path) -> Path:
         embeddings[content] = get_text_embedding(content)
 
     meta = {"id": agent_id, "agent_type": "survey", "ready": True,
-            "embedding_backend": EMBEDDING_BACKEND, "item_count": len(records)}
+            "embedding_backend": EMBEDDING_BACKEND, "item_count": len(records),
+            "data_origin": data_origin}
     destination.mkdir(parents=True)
     memory_dir = destination / "memory_stream"
     memory_dir.mkdir()

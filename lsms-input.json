@@ -1,6 +1,9 @@
 {
-  "id": "lsms-respondent-001",
-  "profile": {},
+  "id": "joon-lsms-synthetic",
+  "profile": {
+    "first_name": "Joon",
+    "last_name": "Park"
+  },
   "responses": [
     {
       "question": "What age group are you in?",
@@ -11,7 +14,7 @@
         "45-54",
         "55 or older"
       ],
-      "answer": ""
+      "answer": "25-34"
     },
     {
       "question": "What sex is recorded for you?",
@@ -20,7 +23,7 @@
         "Male",
         "Another response"
       ],
-      "answer": ""
+      "answer": "Male"
     },
     {
       "question": "How many people usually live in your household, including you?",
@@ -30,7 +33,7 @@
         "3",
         "4 or more"
       ],
-      "answer": ""
+      "answer": "1"
     },
     {
       "question": "What is your current marital status?",
@@ -41,7 +44,7 @@
         "Divorced",
         "Widowed"
       ],
-      "answer": ""
+      "answer": "Never married"
     },
     {
       "question": "Do you currently live with a romantic partner?",
@@ -49,7 +52,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "No"
     },
     {
       "question": "How would you describe your ethnic background?",
@@ -58,7 +61,7 @@
         "Other Asian",
         "Another background"
       ],
-      "answer": ""
+      "answer": "Korean"
     },
     {
       "question": "Are you a U.S. citizen?",
@@ -66,7 +69,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "No"
     },
     {
       "question": "Do you speak a language other than English?",
@@ -74,7 +77,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "Yes"
     },
     {
       "question": "What is the highest degree you have completed?",
@@ -84,7 +87,7 @@
         "Master's degree",
         "Doctoral degree"
       ],
-      "answer": ""
+      "answer": "Master's degree"
     },
     {
       "question": "Are you currently enrolled in formal education?",
@@ -92,7 +95,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "Yes"
     },
     {
       "question": "What level of program are you enrolled in?",
@@ -102,7 +105,7 @@
         "Master's program",
         "Doctoral program"
       ],
-      "answer": ""
+      "answer": "Doctoral program"
     },
     {
       "question": "What is your current field of study?",
@@ -112,7 +115,7 @@
         "Humanities or arts",
         "Other"
       ],
-      "answer": ""
+      "answer": "Computer science"
     },
     {
       "question": "Where are you currently studying?",
@@ -121,7 +124,7 @@
         "Another university",
         "Not enrolled"
       ],
-      "answer": ""
+      "answer": "Stanford University"
     },
     {
       "question": "Did you do any paid work in the last seven days?",
@@ -129,7 +132,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "Yes"
     },
     {
       "question": "What best describes your main occupation?",
@@ -139,7 +142,7 @@
         "Other professional",
         "Not working"
       ],
-      "answer": ""
+      "answer": "Computer science researcher"
     },
     {
       "question": "What kind of organization is your main workplace?",
@@ -150,7 +153,7 @@
         "Self-employed",
         "Not working"
       ],
-      "answer": ""
+      "answer": "University"
     },
     {
       "question": "How many paid jobs did you have in the last month?",
@@ -159,7 +162,7 @@
         "1",
         "2 or more"
       ],
-      "answer": ""
+      "answer": "1"
     },
     {
       "question": "About how many hours do you usually work in a week?",
@@ -170,7 +173,7 @@
         "70-89",
         "90 or more"
       ],
-      "answer": ""
+      "answer": "70-89"
     },
     {
       "question": "How many weeks did you work during the last year?",
@@ -180,7 +183,7 @@
         "26-51",
         "52"
       ],
-      "answer": ""
+      "answer": "52"
     },
     {
       "question": "What is your primary source of work income?",
@@ -190,7 +193,7 @@
         "Self-employment",
         "No work income"
       ],
-      "answer": ""
+      "answer": "Paid doctoral research position"
     },
     {
       "question": "Did you receive occasional income from speaking events?",
@@ -198,7 +201,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "Yes"
     },
     {
       "question": "In which country were you born?",
@@ -207,7 +210,7 @@
         "United States",
         "Another country"
       ],
-      "answer": ""
+      "answer": "South Korea"
     },
     {
       "question": "At roughly what age did you move to the United States?",
@@ -218,7 +221,7 @@
         "14-17",
         "18 or older"
       ],
-      "answer": ""
+      "answer": "11-13"
     },
     {
       "question": "In which U.S. region did you live at age 16?",
@@ -227,7 +230,7 @@
         "Other U.S. region",
         "Outside the United States"
       ],
-      "answer": ""
+      "answer": "New England"
     },
     {
       "question": "In which state do you currently live?",
@@ -236,7 +239,7 @@
         "Another state",
         "Outside the United States"
       ],
-      "answer": ""
+      "answer": "California"
     },
     {
       "question": "What type of dwelling do you live in?",
@@ -246,7 +249,7 @@
         "Shared dormitory",
         "Other"
       ],
-      "answer": ""
+      "answer": "Apartment"
     },
     {
       "question": "Does your household own or rent its home?",
@@ -255,7 +258,7 @@
         "Rent",
         "Other arrangement"
       ],
-      "answer": ""
+      "answer": "Rent"
     },
     {
       "question": "Who usually pays your housing expenses?",
@@ -264,7 +267,7 @@
         "Shared with household members",
         "Mostly someone else"
       ],
-      "answer": ""
+      "answer": "Mostly me"
     },
     {
       "question": "Is your home within about 30 minutes of your main workplace?",
@@ -272,7 +275,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "Yes"
     },
     {
       "question": "What is your approximate monthly rent?",
@@ -282,7 +285,7 @@
         "$2,500-$3,499",
         "$3,500 or more"
       ],
-      "answer": ""
+      "answer": "$2,500-$3,499"
     },
     {
       "question": "Does your dwelling have electricity?",
@@ -290,7 +293,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "Yes"
     },
     {
       "question": "Does your dwelling have piped water?",
@@ -298,7 +301,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "Yes"
     },
     {
       "question": "Does your dwelling have home internet access?",
@@ -306,7 +309,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "Yes"
     },
     {
       "question": "Which category was your largest household expense last month?",
@@ -317,7 +320,7 @@
         "Health care",
         "Other"
       ],
-      "answer": ""
+      "answer": "Rent"
     },
     {
       "question": "Apart from rent, which expense is most regular for you?",
@@ -327,7 +330,7 @@
         "Health care",
         "Other"
       ],
-      "answer": ""
+      "answer": "Food"
     },
     {
       "question": "In the last year, were you unable to buy food you needed?",
@@ -335,7 +338,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "No"
     },
     {
       "question": "About how much does your household spend on food per month?",
@@ -345,7 +348,7 @@
         "$800-$1,199",
         "$1,200 or more"
       ],
-      "answer": ""
+      "answer": "$400-$799"
     },
     {
       "question": "Do you usually travel abroad to visit family during the year?",
@@ -353,7 +356,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "Yes"
     },
     {
       "question": "How would you rate your current health?",
@@ -363,7 +366,7 @@
         "Fair",
         "Poor"
       ],
-      "answer": ""
+      "answer": "Good"
     },
     {
       "question": "Do you currently have a chronic condition that limits daily life?",
@@ -371,7 +374,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "No"
     },
     {
       "question": "Has a health problem limited your ability to work recently?",
@@ -379,7 +382,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "No"
     },
     {
       "question": "Do you have health care coverage?",
@@ -387,7 +390,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "Yes"
     },
     {
       "question": "Have you had to skip needed health care because of cost or access?",
@@ -395,7 +398,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "No"
     },
     {
       "question": "Do you currently maintain a regular exercise routine?",
@@ -403,7 +406,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "No"
     },
     {
       "question": "Do you currently owe money on loans or credit cards?",
@@ -411,7 +414,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "No"
     },
     {
       "question": "Do you have savings available for unexpected expenses?",
@@ -419,7 +422,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "Yes"
     },
     {
       "question": "Could you pay a $400 emergency expense from available funds?",
@@ -427,7 +430,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "Yes"
     },
     {
       "question": "Do you currently receive means-tested government assistance?",
@@ -435,7 +438,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "No"
     },
     {
       "question": "In the last year, did you miss a bill because you lacked money?",
@@ -443,7 +446,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "No"
     },
     {
       "question": "How would you describe your current financial situation?",
@@ -452,7 +455,7 @@
         "Just getting by",
         "Difficult"
       ],
-      "answer": ""
+      "answer": "Comfortable"
     },
     {
       "question": "Could family provide occasional financial help if needed?",
@@ -460,7 +463,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "Yes"
     },
     {
       "question": "What is your approximate total wealth?",
@@ -470,7 +473,7 @@
         "$80,000-$100,000",
         "Over $100,000"
       ],
-      "answer": ""
+      "answer": "$80,000-$100,000"
     },
     {
       "question": "Does your household own a car?",
@@ -478,7 +481,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "No"
     },
     {
       "question": "Do you personally own a computer?",
@@ -486,7 +489,7 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "Yes"
     },
     {
       "question": "Do you personally own a smartphone?",
@@ -494,7 +497,8 @@
         "Yes",
         "No"
       ],
-      "answer": ""
+      "answer": "Yes"
     }
-  ]
+  ],
+  "data_origin": "synthetic answers inferred or generated from interview agent 01fd7d2a-0357-4c1b-9f3e-8eade2d537ae; not respondent-reported"
 }
