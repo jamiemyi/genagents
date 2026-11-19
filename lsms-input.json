@@ -1,0 +1,500 @@
+{
+  "id": "lsms-respondent-001",
+  "profile": {},
+  "responses": [
+    {
+      "question": "What age group are you in?",
+      "options": [
+        "18-24",
+        "25-34",
+        "35-44",
+        "45-54",
+        "55 or older"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "What sex is recorded for you?",
+      "options": [
+        "Female",
+        "Male",
+        "Another response"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "How many people usually live in your household, including you?",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "4 or more"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "What is your current marital status?",
+      "options": [
+        "Never married",
+        "Married",
+        "Separated",
+        "Divorced",
+        "Widowed"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Do you currently live with a romantic partner?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "How would you describe your ethnic background?",
+      "options": [
+        "Korean",
+        "Other Asian",
+        "Another background"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Are you a U.S. citizen?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Do you speak a language other than English?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "What is the highest degree you have completed?",
+      "options": [
+        "High school or less",
+        "Bachelor's degree",
+        "Master's degree",
+        "Doctoral degree"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Are you currently enrolled in formal education?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "What level of program are you enrolled in?",
+      "options": [
+        "Not enrolled",
+        "Undergraduate program",
+        "Master's program",
+        "Doctoral program"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "What is your current field of study?",
+      "options": [
+        "Computer science",
+        "Another STEM field",
+        "Humanities or arts",
+        "Other"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Where are you currently studying?",
+      "options": [
+        "Stanford University",
+        "Another university",
+        "Not enrolled"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Did you do any paid work in the last seven days?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "What best describes your main occupation?",
+      "options": [
+        "Computer science researcher",
+        "Teacher",
+        "Other professional",
+        "Not working"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "What kind of organization is your main workplace?",
+      "options": [
+        "University",
+        "Private company",
+        "Government",
+        "Self-employed",
+        "Not working"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "How many paid jobs did you have in the last month?",
+      "options": [
+        "0",
+        "1",
+        "2 or more"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "About how many hours do you usually work in a week?",
+      "options": [
+        "Under 30",
+        "30-49",
+        "50-69",
+        "70-89",
+        "90 or more"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "How many weeks did you work during the last year?",
+      "options": [
+        "0",
+        "1-25",
+        "26-51",
+        "52"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "What is your primary source of work income?",
+      "options": [
+        "Paid doctoral research position",
+        "Salary from another job",
+        "Self-employment",
+        "No work income"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Did you receive occasional income from speaking events?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "In which country were you born?",
+      "options": [
+        "South Korea",
+        "United States",
+        "Another country"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "At roughly what age did you move to the United States?",
+      "options": [
+        "Born in the United States",
+        "0-10",
+        "11-13",
+        "14-17",
+        "18 or older"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "In which U.S. region did you live at age 16?",
+      "options": [
+        "New England",
+        "Other U.S. region",
+        "Outside the United States"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "In which state do you currently live?",
+      "options": [
+        "California",
+        "Another state",
+        "Outside the United States"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "What type of dwelling do you live in?",
+      "options": [
+        "Apartment",
+        "Detached house",
+        "Shared dormitory",
+        "Other"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Does your household own or rent its home?",
+      "options": [
+        "Own",
+        "Rent",
+        "Other arrangement"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Who usually pays your housing expenses?",
+      "options": [
+        "Mostly me",
+        "Shared with household members",
+        "Mostly someone else"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Is your home within about 30 minutes of your main workplace?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "What is your approximate monthly rent?",
+      "options": [
+        "Under $1,500",
+        "$1,500-$2,499",
+        "$2,500-$3,499",
+        "$3,500 or more"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Does your dwelling have electricity?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Does your dwelling have piped water?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Does your dwelling have home internet access?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Which category was your largest household expense last month?",
+      "options": [
+        "Rent",
+        "Food",
+        "Transportation",
+        "Health care",
+        "Other"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Apart from rent, which expense is most regular for you?",
+      "options": [
+        "Food",
+        "Transportation",
+        "Health care",
+        "Other"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "In the last year, were you unable to buy food you needed?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "About how much does your household spend on food per month?",
+      "options": [
+        "Under $400",
+        "$400-$799",
+        "$800-$1,199",
+        "$1,200 or more"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Do you usually travel abroad to visit family during the year?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "How would you rate your current health?",
+      "options": [
+        "Excellent",
+        "Good",
+        "Fair",
+        "Poor"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Do you currently have a chronic condition that limits daily life?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Has a health problem limited your ability to work recently?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Do you have health care coverage?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Have you had to skip needed health care because of cost or access?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Do you currently maintain a regular exercise routine?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Do you currently owe money on loans or credit cards?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Do you have savings available for unexpected expenses?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Could you pay a $400 emergency expense from available funds?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Do you currently receive means-tested government assistance?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "In the last year, did you miss a bill because you lacked money?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "How would you describe your current financial situation?",
+      "options": [
+        "Comfortable",
+        "Just getting by",
+        "Difficult"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Could family provide occasional financial help if needed?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "What is your approximate total wealth?",
+      "options": [
+        "Under $20,000",
+        "$20,000-$79,999",
+        "$80,000-$100,000",
+        "Over $100,000"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Does your household own a car?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Do you personally own a computer?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    },
+    {
+      "question": "Do you personally own a smartphone?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": ""
+    }
+  ]
+}
