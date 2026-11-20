@@ -82,6 +82,9 @@ def run_gpt_generate_categorical_resp(
 
 
 def categorical_resp(agent, questions): 
+  if getattr(agent, "agent_type", "interview") == "survey":
+    from genagents.modules.survey_grounding import categorical_survey_resp
+    return categorical_survey_resp(agent, questions)
   anchor = " ".join(list(questions.keys()))
   agent_desc = _main_agent_desc(agent, anchor)
   return run_gpt_generate_categorical_resp(
@@ -178,7 +181,7 @@ def utterance(agent, curr_dialogue, context):
   str_dialogue = ""
   for row in curr_dialogue:
     str_dialogue += f"[{row[0]}]: {row[1]}\n"
-  str_dialogue += f"[{agent.get_fullname()}]: [Fill in]\n"
+  str_dialogue += f"[{agent.get_fullname() or 'Agent'}]: [Fill in]\n"
 
   anchor = str_dialogue
   agent_desc = _utterance_agent_desc(agent, anchor)

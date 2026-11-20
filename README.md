@@ -148,18 +148,19 @@ The first run downloads the small embedding model (about 90 MB). After that, thi
 
 #### Create a survey agent from answered questions
 
-The [survey agent folder](agent_bank/populations/survey_agents/README.md) has a
-blank `lsms_template` with the same four files as the interview agent. The
-[LSMS-inspired questionnaire](environment/survey/lsms_like_questionnaire.json)
-provides 55 question and option sets. To create a respondent, supply an `id`,
-an optional `profile`, and actual answers to a subset of those questions:
+The survey agent folder has a blank `lsms_template` with the same four files
+as the interview agent. To
+create a respondent from any survey, supply an `id`, an optional `profile`,
+and answered questions in a JSON file:
 
 ```json
 {
   "id": "respondent-001",
   "profile": {"first_name": "Respondent"},
   "responses": [
-    {"question": "What age group are you in?", "answer": "25-34"}
+    {"question": "What age group are you in?", "answer": "25-34",
+     "options": ["18-24", "25-34", "35-44"]},
+    {"question": "What did you enjoy this week?", "answer": "Visiting family."}
   ]
 }
 ```
@@ -172,8 +173,10 @@ python build_survey_agent.py path/to/your-respondent.json
 
 This creates `agent_bank/populations/survey_agents/<id>/` with only
 `meta.json`, `scratch.json`, and `memory_stream/{nodes,embeddings}.json`.
-The builder checks questions and answers against the LSMS questionnaire and
-embeds each answered question as a memory with the `EMBEDDING_BACKEND` in
+`options` is optional; when present, the builder checks that the answer is one
+of them. To validate against a full question-to-options JSON map, pass
+`--questionnaire path/to/questionnaire.json`. The builder embeds each answered
+question as a memory with the `EMBEDDING_BACKEND` in
 `simulation_engine/settings.py`; use the same backend when running the agent.
 It refuses to overwrite an existing ID. To build a population, run it once
 for each respondent's input file.
@@ -181,13 +184,16 @@ for each respondent's input file.
 There are two ways to use the generated agent:
 
 - `python main.py survey --agent-id <id>` loads the same `GenerativeAgent` class
-  used for interview agents and lets you ask categorical questions.
-- `python run_survey.py --agent-id <id>` loads that agent through `Survey.survey`
-  and asks the first four questions from the shared LSMS questionnaire. Add
-  `--all` for every question. It
-  saves results to `survey_run/responses.csv`.
+  used for interview agents and starts an open-ended conversation. When using
+  `categorical_resp`, survey agents return an exact recorded answer directly
+  when its option is available; for new questions, they retrieve a few related
+  survey answers and use a survey-specific prediction prompt.
+- `python run_survey.py --agent-id <id> --questionnaire path/to/questions.json`
+  loads that agent through `Survey.survey` and asks the first four questions
+  from the supplied question-to-options map. Add `--all` for every question.
+  It saves results to `survey_run/responses.csv`.
 
-The questionnaire and blank template contain no respondent answers. For an
+The question-to-options map and blank template contain no respondent answers. For an
 independent accuracy test, keep held-out answers out of each agent's input and
 use the [survey evaluation workflow](evaluation/README.md). It compares answer
 distributions using total variation distance (TVD).
@@ -227,7 +233,7 @@ Tips:
   - `populations/`: Contains pre-generated agents
     - `gss_agents/`: Demographic agent data based on the GSS
     - `interview_agent/`: Example agent data (see [Interview Agent](#sample-agent))
-    - `survey_agents/`: Blank LSMS template and agents built from actual answers
+    - `survey_agents/`: Blank template and agents built from actual answers
 - `build_survey_agent.py`: Creates one survey agent from a JSON input file
 - `README.md`: This readme file
 - `requirements.txt`: List of Python dependencies
@@ -300,20 +306,26 @@ print(response)
 To have a continuing conversation in the terminal, run `main.py`:
 
 ```bash
-python main.py interview                 # Example interview agent (the default)
-python main.py jamie                     # Jamie's profile
-python main.py gss                       # First GSS agent by ID
-python main.py survey                    # First survey agent, after you create one
+python main.py interview                 # Random interview agent (the default)
+python main.py gss                       # Random GSS agent
+python main.py survey                    # Random ready survey agent, after you create one
 python main.py survey --agent-id respondent-001
+python main.py gss --seed 42             # Repeat the same random selection
 python main.py --list-agents --limit 20  # Show GSS names and IDs
 python main.py --list-agents --search Eric
 python main.py gss --agent-id 05ced490-251d-4661-a324-502952c729df
 python main.py path/to/saved/agent       # Any saved agent folder
 ```
 
-Chats keep earlier turns in their conversation history. Survey mode prompts for
-a question and answer choices separated by `|`, then predicts one listed answer
-from the survey agent's stored responses. Type `exit` or `quit` to finish.
+All agent types use the same open-ended conversation loop and keep earlier turns
+in their dialogue history. Type `exit` or `quit` to finish. To ask a survey
+agent a categorical question with answer choices, call its `categorical_resp`
+method or use `run_survey.py`.
+
+For a repeatable workflow with tabular survey data, see the [data preparation
+and evaluation pipeline](evaluation/DATA_PIPELINE.md). A mapping file defines
+the respondent ID, questions, answer options, and held-out questions. The
+Nigeria Wave 5 mapping is one example.
 
 ### Memory and Reflection
 

@@ -1,0 +1,52 @@
+{
+  "source": "../NGA_2023_GHSP-W5_v03_M_CSV/sect1_harvestw5.csv",
+  "id_columns": ["hhid", "indiv"],
+  "cohort_column": "sector",
+  "agent_id_prefix": "nga-w5",
+  "data_origin": "Nigeria GHSP Wave 5 household roster; responses may be proxy reported",
+  "sample_size": 25,
+  "sample_seed": 42,
+  "questions": [
+    {
+      "id": "sex",
+      "column": "s1q2",
+      "text": "What is the sex of [NAME]?",
+      "role": "train",
+      "options": ["Male", "Female"],
+      "value_map": {"1": "Male", "2": "Female"}
+    },
+    {
+      "id": "household_member",
+      "column": "s1q4",
+      "text": "Is [NAME] still a member of this household?",
+      "role": "train",
+      "options": ["Yes", "No"],
+      "value_map": {"1": "Yes", "2": "No"}
+    },
+    {
+      "id": "national_id",
+      "column": "s1q12",
+      "text": "Does [NAME] have a National ID Number or National Identity Card?",
+      "role": "train",
+      "options": ["Yes", "No"],
+      "value_map": {"1": "Yes", "2": "No"},
+      "missing_values": ["99"]
+    },
+    {
+      "id": "marital_status",
+      "column": "s1q16",
+      "text": "What is [NAME]'s present marital status?",
+      "role": "test",
+      "options": ["Married (monogamous)", "Married (polygamous)", "Informal union", "Divorced", "Separated", "Widowed", "Never married"],
+      "value_map": {
+        "1": "Married (monogamous)",
+        "2": "Married (polygamous)",
+        "3": "Informal union",
+        "4": "Divorced",
+        "5": "Separated",
+        "6": "Widowed",
+        "7": "Never married"
+      }
+    }
+  ]
+}

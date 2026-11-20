@@ -1,18 +1,13 @@
 """Run a generated survey agent using the project's Survey environment.
 
 From the repository root:
-    python run_survey.py --agent-id respondent-001
-    python run_survey.py --agent-id respondent-001 --all
+    python run_survey.py --agent-id respondent-001 --questionnaire questions.json
+    python run_survey.py --agent-id respondent-001 --questionnaire questions.json --all
 """
 
 import argparse
 import json
 from pathlib import Path
-
-import pandas as pd
-
-from environment.survey.survey import Survey
-
 
 ROOT = Path(__file__).resolve().parent
 
@@ -25,11 +20,8 @@ def main():
         type=Path,
         default=ROOT / "agent_bank/populations/survey_agents",
     )
-    parser.add_argument(
-        "--questionnaire",
-        type=Path,
-        help="question-to-options JSON (default: shared LSMS questionnaire)",
-    )
+    parser.add_argument("--questionnaire", type=Path, required=True,
+                        help="question-to-options JSON to administer")
     parser.add_argument("--output", type=Path, default=ROOT / "survey_run")
     parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--all", action="store_true", help="run all questionnaire items")
@@ -46,7 +38,7 @@ def main():
         parser.error(f"Could not load survey agent metadata: {exc}")
     if not meta.get("ready"):
         parser.error(f"Survey agent has no respondent answers: {agent_folder}")
-    questionnaire_path = args.questionnaire or ROOT / "environment/survey/lsms_like_questionnaire.json"
+    questionnaire_path = args.questionnaire
     try:
         with questionnaire_path.open() as stream:
             questionnaire = json.load(stream)
@@ -54,6 +46,9 @@ def main():
         parser.error(f"Could not load questionnaire {questionnaire_path}: {exc}")
     if not isinstance(questionnaire, dict) or not questionnaire:
         parser.error("questionnaire must be a non-empty question-to-options object")
+
+    import pandas as pd
+    from environment.survey.survey import Survey
 
     selected = list(questionnaire.items())
     if not args.all:

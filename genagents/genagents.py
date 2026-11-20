@@ -1,4 +1,6 @@
 import uuid
+import json
+from pathlib import Path
 
 from genagents.modules.interaction import *
 from genagents.modules.memory_stream import *
@@ -21,6 +23,9 @@ class GenerativeAgent:
       # Loading the agent's memories. 
       with open(f"{agent_folder}/scratch.json") as json_file:
         scratch = json.load(json_file)
+      meta_path = Path(agent_folder) / "meta.json"
+      self.agent_type = (json.loads(meta_path.read_text()).get("agent_type", "interview")
+                         if meta_path.exists() else "interview")
       self.id = uuid.uuid4()
       self.scratch = scratch
       with open(f"{agent_folder}/memory_stream/embeddings.json") as json_file:
@@ -31,6 +36,7 @@ class GenerativeAgent:
 
     else: 
       self.id = uuid.uuid4()
+      self.agent_type = "interview"
       self.scratch = {}
       self.memory_stream = MemoryStream([], {})
 

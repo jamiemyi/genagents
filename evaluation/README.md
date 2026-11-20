@@ -1,5 +1,8 @@
 # Survey evaluation
 
+For automatic preparation of agents and held-out files from a tabular dataset,
+see the [data pipeline](DATA_PIPELINE.md).
+
 This workflow compares simulated categorical answers with observed survey
 answers. It measures **total variation distance (TVD)** between answer
 distributions for each question and cohort:

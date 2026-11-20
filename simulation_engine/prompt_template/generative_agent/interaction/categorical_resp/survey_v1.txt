@@ -1,0 +1,15 @@
+Respondent profile (recorded fields):
+!<INPUT 0>!
+
+Related answers the respondent previously gave to survey questions:
+!<INPUT 1>!
+
+New survey question and permitted answer options:
+!<INPUT 2>!
+
+Predict the answer this respondent would select. Treat recorded answers as evidence
+about this respondent, not as an interview transcript. Prefer closely related answers
+over broad assumptions about people with similar demographics. Do not claim that a
+new answer was observed. If the evidence is sparse, make the best cautious choice
+among the permitted options. Return only a JSON object in this form:
+{"response": "<one option exactly>", "reasoning": "<brief explanation tied to the evidence>"}

@@ -1,4 +1,4 @@
-"""Build an interview-format agent from one respondent's LSMS answers."""
+"""Build a survey agent from a JSON file of one respondent's answers."""
 
 import argparse
 import json
@@ -7,9 +7,6 @@ from pathlib import Path
 
 
 DEFAULT_POPULATION = Path(__file__).resolve().parent / "agent_bank/populations/survey_agents"
-QUESTIONNAIRE = Path(__file__).resolve().parent / "environment/survey/lsms_like_questionnaire.json"
-
-
 def _required_text(value, label):
     if not isinstance(value, str) or not value.strip():
         raise ValueError(f"{label} must be non-empty text")
@@ -36,13 +33,20 @@ def _validate_input(data, questionnaire):
     for index, item in enumerate(responses, 1):
         if not isinstance(item, dict):
             raise ValueError(f"responses[{index}] must be an object")
-        question = _required_text(item.get("question"), f"responses[{index}].question")
+        question = " ".join(_required_text(
+            item.get("question"), f"responses[{index}].question").split())
         answer = _required_text(item.get("answer"), f"responses[{index}].answer")
-        options = questionnaire.get(question)
-        if options is None:
-            raise ValueError(f"responses[{index}].question is not in the LSMS questionnaire")
-        if answer not in options:
-            raise ValueError(f"responses[{index}].answer must match one option exactly")
+        options = item.get("options")
+        if options is not None:
+            _validate_options(options, f"responses[{index}].options")
+            if answer not in options:
+                raise ValueError(f"responses[{index}].answer must match one option exactly")
+        if questionnaire is not None:
+            allowed = questionnaire.get(question)
+            if allowed is None:
+                raise ValueError(f"responses[{index}].question is not in the questionnaire")
+            if answer not in allowed:
+                raise ValueError(f"responses[{index}].answer must match one option exactly")
         if question in seen_questions:
             raise ValueError(f"Duplicate question at responses[{index}]")
         seen_questions.add(question)
@@ -50,9 +54,22 @@ def _validate_input(data, questionnaire):
     return agent_id, profile, records, data_origin.strip()
 
 
-def build(source: Path, population: Path) -> Path:
+def _validate_options(options, label):
+    if (not isinstance(options, list) or not options or
+            any(not isinstance(option, str) or not option.strip() for option in options) or
+            len(options) != len(set(options))):
+        raise ValueError(f"{label} must be a non-empty list of distinct text options")
+
+
+def build(source: Path, population: Path, questionnaire: Path = None) -> Path:
     """Validate and create population/<id>; never overwrite an existing agent."""
-    questionnaire = json.loads(QUESTIONNAIRE.read_text())
+    if questionnaire is not None:
+        questionnaire = json.loads(questionnaire.read_text())
+        if not isinstance(questionnaire, dict):
+            raise ValueError("questionnaire must be a JSON object of questions and options")
+        for question, options in questionnaire.items():
+            _required_text(question, "questionnaire question")
+            _validate_options(options, f"questionnaire[{question!r}]")
     agent_id, profile, records, data_origin = _validate_input(
         json.loads(source.read_text()), questionnaire)
     destination = population / agent_id
@@ -93,9 +110,11 @@ def main():
     parser.add_argument("input", type=Path, help="JSON profile and answered questions")
     parser.add_argument("--population", type=Path, default=DEFAULT_POPULATION,
                         help="directory for generated survey agent folders")
+    parser.add_argument("--questionnaire", type=Path,
+                        help="optional JSON question-to-options map for validation")
     args = parser.parse_args()
     try:
-        destination = build(args.input, args.population)
+        destination = build(args.input, args.population, args.questionnaire)
     except (ValueError, OSError, json.JSONDecodeError) as exc:
         parser.error(str(exc))
     print(f"Created {destination}")

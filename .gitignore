@@ -9,3 +9,4 @@ embeddings.json.bak
 /survey_run/
 *.egg-info/
 build/
+/NGA_2023_GHSP-W5_v03_M_CSV/

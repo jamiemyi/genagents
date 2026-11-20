@@ -1,25 +1,44 @@
-"""Talk to an agent or ask the survey agent categorical questions."""
+"""Have an open-ended conversation with an interview, GSS, or survey agent."""
 
 import argparse
 import json
+import random
 from pathlib import Path
 
 from genagents.genagents import GenerativeAgent
-from jamie_agent import create_jamie
 
 
 ROOT = Path(__file__).resolve().parent
-INTERVIEW_AGENT = (
-    ROOT / "agent_bank/populations/interview_agent"
-    / "01fd7d2a-0357-4c1b-9f3e-8eade2d537ae"
-)
-GSS_AGENTS = ROOT / "agent_bank/populations/gss_agents"
-SURVEY_AGENTS = ROOT / "agent_bank/populations/survey_agents"
+POPULATIONS = {
+    "interview": ROOT / "agent_bank/populations/interview_agent",
+    "gss": ROOT / "agent_bank/populations/gss_agents",
+    "survey": ROOT / "agent_bank/populations/survey_agents",
+}
+SAVED_AGENTS = {
+    "jamie": ROOT / "agent_bank/populations/my_agents/jamie",
+}
 
 
 def gss_agent_folders():
-    return sorted(folder for folder in GSS_AGENTS.iterdir()
-                  if folder.is_dir() and (folder / "scratch.json").is_file())
+    return agent_folders("gss")
+
+
+def agent_folders(selection):
+    population = POPULATIONS[selection]
+    if not population.is_dir():
+        return []
+    folders = []
+    for folder in population.iterdir():
+        if not folder.is_dir() or not all((folder / name).is_file() for name in (
+                "scratch.json", "memory_stream/nodes.json",
+                "memory_stream/embeddings.json")):
+            continue
+        if selection == "survey":
+            meta = folder / "meta.json"
+            if not meta.is_file() or not json.loads(meta.read_text()).get("ready"):
+                continue
+        folders.append(folder)
+    return sorted(folders)
 
 
 def list_gss_agents(search, limit):
@@ -40,20 +59,21 @@ def list_gss_agents(search, limit):
         print("No matching GSS agents found.")
 
 
-def load_agent(selection, agent_id=None):
-    if selection == "jamie":
-        return create_jamie()
-    if selection == "interview":
-        folder = INTERVIEW_AGENT
-    elif selection == "gss":
-        folders = gss_agent_folders()
+def load_agent(selection, agent_id=None, rng=None):
+    if selection in SAVED_AGENTS:
+        folder = SAVED_AGENTS[selection]
+    elif selection in POPULATIONS:
+        folders = agent_folders(selection)
         if not folders:
-            raise ValueError(f"No GSS agents found in {GSS_AGENTS}")
-        if agent_id and agent_id not in {item.name for item in folders}:
-            raise ValueError(f"GSS agent not found: {agent_id}")
-        folder = GSS_AGENTS / agent_id if agent_id else folders[0]
-        if not agent_id:
-            print(f"Using GSS agent {folder.name}. Pass --agent-id to choose another.")
+            raise ValueError(f"No {selection} agents found in {POPULATIONS[selection]}")
+        if agent_id:
+            matches = [folder for folder in folders if folder.name == agent_id]
+            if not matches:
+                raise ValueError(f"{selection} agent not found: {agent_id}")
+            folder = matches[0]
+        else:
+            folder = (rng or random).choice(folders)
+            print(f"Using {selection} agent {folder.name}. Pass --agent-id to choose another.")
     else:
         folder = Path(selection).expanduser()
 
@@ -66,24 +86,6 @@ def load_agent(selection, agent_id=None):
     return GenerativeAgent(agent_folder=str(folder))
 
 
-def load_survey_agent(agent_id=None):
-    if not SURVEY_AGENTS.is_dir():
-        raise ValueError(f"No survey agents found in {SURVEY_AGENTS}")
-    folders = sorted(folder for folder in SURVEY_AGENTS.iterdir()
-                     if folder.is_dir() and (folder / "meta.json").is_file()
-                     and json.loads((folder / "meta.json").read_text()).get("ready")
-                     and (folder / "memory_stream/nodes.json").is_file()
-                     and (folder / "memory_stream/embeddings.json").is_file())
-    if not folders:
-        raise ValueError(f"No survey agents found in {SURVEY_AGENTS}")
-    if agent_id and agent_id not in {folder.name for folder in folders}:
-        raise ValueError(f"Survey agent not found: {agent_id}")
-    folder = SURVEY_AGENTS / agent_id if agent_id else folders[0]
-    if not agent_id:
-        print(f"Using survey agent {folder.name}. Pass --agent-id to choose another.")
-    return GenerativeAgent(agent_folder=str(folder))
-
-
 class Conversation:
     def __init__(self, agent, interviewer_name="Interviewer"):
         self.agent = (agent if isinstance(agent, GenerativeAgent)
@@ -92,7 +94,7 @@ class Conversation:
         self.conversation_history = []
 
     def start(self):
-        name = self.agent.get_fullname()
+        name = self.agent.get_fullname() or "Agent"
         print(f"Starting conversation with {name}.\nType 'exit' to end the conversation.\n")
         while True:
             try:
@@ -110,47 +112,14 @@ class Conversation:
             print(f"{name}: {agent_response}")
             self.conversation_history.append([name, agent_response])
 
-#written such that survey agents have survey conversations, not sure if I like this
-class SurveyConversation:
-    def __init__(self, agent):
-        self.agent = agent
-
-    def start(self):
-        print("Ask a categorical survey question. Separate answer choices with '|'.\n"
-              "Type 'exit' or 'quit' to end.\n")
-        while True:
-            try:
-                question = input("Question: ").strip()
-                if question.lower() in ("exit", "quit"):
-                    break
-                if not question:
-                    continue
-                choices = input("Options (separate with |): ").strip()
-                if choices.lower() in ("exit", "quit"):
-                    break
-            except (EOFError, KeyboardInterrupt):
-                print("\nSurvey ended.")
-                return
-            options = [option.strip() for option in choices.split("|")]
-            if len(options) < 2 or any(not option for option in options) or len(set(options)) != len(options):
-                print("Enter at least two distinct, non-empty options.\n")
-                continue
-            try:
-                answer = self.agent.categorical_resp({question: options})["responses"][0]
-            except (RuntimeError, ValueError) as exc:
-                print(f"Could not answer: {exc}\n")
-                continue
-            print(f"Answer: {answer}\n")
-        print("Survey ended.")
-
-
 def main():
     parser = argparse.ArgumentParser(
-        description="Chat with an agent or ask the survey agent categorical questions."
+        description="Chat with Jamie, an interview, GSS, survey, or saved agent."
     )
     parser.add_argument("agent", nargs="?", default="interview",
                         help="interview (default), jamie, gss, survey, or a saved agent folder")
-    parser.add_argument("--agent-id", help="GSS or survey agent ID")
+    parser.add_argument("--agent-id", help="choose a specific agent instead of a random one")
+    parser.add_argument("--seed", type=int, help="repeat the same random agent choice")
     parser.add_argument("--list-agents", action="store_true",
                         help="list GSS agent IDs and names without starting a chat")
     parser.add_argument("--search", default="", help="filter --list-agents by name or ID")
@@ -160,22 +129,18 @@ def main():
 
     if args.limit < 1:
         parser.error("--limit must be at least 1")
-    if args.agent_id and args.agent not in ("gss", "survey"):
-        parser.error("--agent-id requires the gss or survey agent")
+    if args.agent_id and args.agent not in POPULATIONS:
+        parser.error("--agent-id requires interview, gss, or survey")
     if args.list_agents:
         list_gss_agents(args.search, args.limit)
         return
     if args.search:
         parser.error("--search requires --list-agents")
     try:
-        agent = (load_survey_agent(args.agent_id) if args.agent == "survey"
-                 else load_agent(args.agent, args.agent_id))
+        agent = load_agent(args.agent, args.agent_id, random.Random(args.seed))
     except ValueError as exc:
         parser.error(str(exc))
-    if args.agent == "survey":
-        SurveyConversation(agent).start()
-    else:
-        Conversation(agent).start()
+    Conversation(agent).start()
 
 
 if __name__ == "__main__":
